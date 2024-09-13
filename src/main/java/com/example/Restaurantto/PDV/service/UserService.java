@@ -6,7 +6,7 @@ import com.example.Restaurantto.PDV.dto.LoginUserDTO;
 import com.example.Restaurantto.PDV.model.ModelRole;
 import com.example.Restaurantto.PDV.model.ModelUser;
 import com.example.Restaurantto.PDV.model.ModelUserDetailsImpl;
-import com.example.Restaurantto.PDV.repository.UserRepsitory;
+import com.example.Restaurantto.PDV.repository.UserRepository;
 import com.example.Restaurantto.PDV.security.SecurityConfig;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
-    private UserRepsitory userRepsitory;
+    private UserRepository userRepository;
     @Autowired
     private SecurityConfig securityConfig;
     @Autowired
@@ -29,12 +29,15 @@ public class UserService {
     private JwtTokenService jwtTokenService;
 
     public void salvarUsuario(CreateUserDTO createUserDTO){
+        if(userRepository.findByEmail(createUserDTO.email()).isPresent()){
+            throw new RuntimeException("E-MAIL JÁ CADASTRADO");
+        }
         ModelUser newUser = ModelUser.builder()
                 .email(createUserDTO.email())
                 .password(securityConfig.passwordEncoder().encode(createUserDTO.password()))
                 .roles(List.of(ModelRole.builder().name(createUserDTO.role()).build()))
                 .build();
-        userRepsitory.save(newUser);
+        userRepository.save(newUser);
     }
 
     public JwtTokenDTO authenticarUsuario(LoginUserDTO loginUserDTO){
@@ -42,9 +45,14 @@ public class UserService {
                 loginUserDTO.email(),
                 loginUserDTO.password());
 
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-        ModelUserDetailsImpl modelUserDetails = (ModelUserDetailsImpl) authentication.getPrincipal();
-        return new JwtTokenDTO(jwtTokenService.generateToken(modelUserDetails));
+        try {
+            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            ModelUserDetailsImpl modelUserDetails = (ModelUserDetailsImpl) authentication.getPrincipal();
+            String token = jwtTokenService.generateToken(modelUserDetails);
+            return new JwtTokenDTO(token);
 
+        } catch (Exception e) {
+            throw new RuntimeException("FALHA NA AUTENTICAÇÃO: " + e.getMessage());
+        }
     }
 }

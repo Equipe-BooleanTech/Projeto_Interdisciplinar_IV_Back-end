@@ -18,6 +18,7 @@ public class ModelUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(unique = true)
     private String email;
     private String password;
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
