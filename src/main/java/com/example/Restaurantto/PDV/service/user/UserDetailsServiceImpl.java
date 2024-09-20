@@ -1,8 +1,8 @@
-package com.example.Restaurantto.PDV.service;
+package com.example.Restaurantto.PDV.service.user;
 
-import com.example.Restaurantto.PDV.model.ModelUser;
-import com.example.Restaurantto.PDV.model.ModelUserDetailsImpl;
-import com.example.Restaurantto.PDV.repository.UserRepository;
+import com.example.Restaurantto.PDV.model.user.ModelUser;
+import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
+import com.example.Restaurantto.PDV.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

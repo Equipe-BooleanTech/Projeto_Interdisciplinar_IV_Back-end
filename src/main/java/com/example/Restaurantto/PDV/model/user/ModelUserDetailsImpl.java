@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.model;
+package com.example.Restaurantto.PDV.model.user;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

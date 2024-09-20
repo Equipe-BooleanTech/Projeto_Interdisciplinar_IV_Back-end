@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.model;
+package com.example.Restaurantto.PDV.model.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,4 +24,14 @@ public class ModelUser {
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<ModelRole> roles;
+    private String name;
+    private String lastName;
+    private String phone;
+    @Column(unique = true)
+    private String cpf;
+    private String cep;
+    private String address;
+    private String city;
+    private String state;
+    private String neighborhood;
 }
