@@ -39,7 +39,7 @@ public class UserController {
         userService.deletarUsuario(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    @PostMapping("/update-password")
+    @PutMapping("/update-password")
     public ResponseEntity<Void> mudarSenha(@RequestBody UpdatePasswordDTO updatePasswordDTO){
         userService.mudarSenha(updatePasswordDTO);
         return new ResponseEntity<>(HttpStatus.OK);
