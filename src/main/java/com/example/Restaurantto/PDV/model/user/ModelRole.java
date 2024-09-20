@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.model;
+package com.example.Restaurantto.PDV.model.user;
 
 import com.example.Restaurantto.PDV.enums.Role;
 import jakarta.persistence.*;

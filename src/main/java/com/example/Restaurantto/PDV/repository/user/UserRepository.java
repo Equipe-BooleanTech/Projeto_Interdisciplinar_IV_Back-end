@@ -1,6 +1,6 @@
-package com.example.Restaurantto.PDV.repository;
+package com.example.Restaurantto.PDV.repository.user;
 
-import com.example.Restaurantto.PDV.model.ModelUser;
+import com.example.Restaurantto.PDV.model.user.ModelUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
