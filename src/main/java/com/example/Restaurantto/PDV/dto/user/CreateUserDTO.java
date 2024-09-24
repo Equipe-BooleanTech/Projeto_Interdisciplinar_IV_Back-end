@@ -3,9 +3,10 @@ package com.example.Restaurantto.PDV.dto.user;
 import com.example.Restaurantto.PDV.enums.Role;
 
 import java.util.List;
+import java.util.UUID;
 
 
-public record CreateUserDTO (Long id,
+public record CreateUserDTO (UUID id,
                              String email,
                              Role role,
                              String name,

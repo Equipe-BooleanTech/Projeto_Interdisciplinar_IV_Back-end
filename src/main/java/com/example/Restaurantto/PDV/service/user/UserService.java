@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,7 +58,7 @@ public class UserService {
         userRepository.save(newUser);
     }
 
-    public void atualizarUsuario(Long id, CreateUserDTO createUserDTO){
+    public void atualizarUsuario(UUID id, CreateUserDTO createUserDTO){
         ModelUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
@@ -74,7 +75,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deletarUsuario(Long id){
+    public void deletarUsuario(UUID id){
         if(!userRepository.existsById(id)){
             throw new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO");
         }
