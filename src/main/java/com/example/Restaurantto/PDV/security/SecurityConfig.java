@@ -27,7 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests( authorize -> authorize
                         .requestMatchers("/api/users/login", "/api/users/create").permitAll()
                         .requestMatchers("/api/users/update/**","/api/users/delete/**", "/api/users/update-password").authenticated()
-                        .requestMatchers("/api/users/get-users").hasRole("ADMIN")
+                        .requestMatchers("/api/users/get-users").hasAnyRole("GERENTE","ADMIN")
                         .anyRequest().denyAll())
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

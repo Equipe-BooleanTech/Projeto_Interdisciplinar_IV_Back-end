@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 
 @Builder
 @NoArgsConstructor
@@ -18,7 +20,7 @@ public class ModelRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private UUID id;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role name;

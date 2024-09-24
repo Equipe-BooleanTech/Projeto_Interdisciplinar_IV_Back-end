@@ -4,8 +4,9 @@ import com.example.Restaurantto.PDV.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
+import java.util.UUID;
 
-public record UserDTO(Long id,
+public record UserDTO(UUID id,
                       String email,
                       List<Role> roles,
                       String name,
