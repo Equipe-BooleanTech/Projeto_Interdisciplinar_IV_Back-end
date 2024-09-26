@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.security;
+package com.example.Restaurantto.PDV.config.security;
 
 import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;

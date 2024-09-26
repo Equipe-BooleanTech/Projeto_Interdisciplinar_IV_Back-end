@@ -9,7 +9,7 @@ import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
 import com.example.Restaurantto.PDV.repository.user.UserRepository;
-import com.example.Restaurantto.PDV.security.SecurityConfig;
+import com.example.Restaurantto.PDV.config.security.SecurityConfig;
 
 import com.example.Restaurantto.PDV.service.auth.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
