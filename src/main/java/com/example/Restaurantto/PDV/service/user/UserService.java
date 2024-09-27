@@ -6,6 +6,7 @@ import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.dto.user.prospectingUserDTO;
 import com.example.Restaurantto.PDV.dto.user.UpdatePasswordDTO;
 import com.example.Restaurantto.PDV.dto.user.UserDTO;
+import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
@@ -44,17 +45,52 @@ public class UserService {
         }
         ModelUser newUser = ModelUser.builder()
                 .email(prospectingUserDTO.email())
-                .roles(List.of(ModelRole.builder().name(prospectingUserDTO.role()).build()))
+                .roles(List.of(ModelRole.builder().name(Role.ROLE_INACTIVE).build()))
                 .fullName(prospectingUserDTO.fullName())
                 .phone(prospectingUserDTO.phone())
                 .enterprise(prospectingUserDTO.enterprise())
                 .message(prospectingUserDTO.message())
-                .isProspecting(prospectingUserDTO.isProspecting())
+                .isProspecting(true)
+                .cpf(null)
+                .cep(null)
+                .address(null)
+                .city(null)
+                .state(null)
+                .neighborhood(null)
+                .cnpj(null)
                 .build();
 
         userRepository.save(newUser);
 
     }
+
+    public void ativarUsuario(UUID id, CreateUserDTO createUserDTO){
+        ModelUser user = userRepository.findById(id)
+                .orElseThrow(()-> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
+        if(!user.isReadyForActivation()){
+            throw new IllegalArgumentException("INFORMAÇÕES INCOMPLETAS PARA ATIVAÇÃO");
+        }
+
+        user.setCpf(createUserDTO.cpf());
+        user.setCep(createUserDTO.cep());
+        user.setAddress(createUserDTO.address());
+        user.setAddressNumber(createUserDTO.addressNumber());
+        user.setCity(createUserDTO.city());
+        user.setState(createUserDTO.state());
+        user.setNeighborhood(createUserDTO.neighborhood());
+        user.setCnpj(createUserDTO.cnpj());
+
+        user.setRoles(List.of(ModelRole.builder().name(Role.ROLE_GERENTE).build()));
+        user.setProspecting(false);
+
+        if (createUserDTO.password() != null){
+            user.setPassword(passwordEncoder.encode(createUserDTO.password()));
+        }else {
+            throw new IllegalArgumentException("SENHA OBRIGATÓRIA NA ATIVAÇÃO");
+        }
+        userRepository.save(user);
+    }
+
 
     public void salvarUsuario(CreateUserDTO createUserDTO){
         if(userRepository.findByEmail(createUserDTO.email()).isPresent()){
