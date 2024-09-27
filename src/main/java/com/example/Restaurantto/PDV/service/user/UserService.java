@@ -3,6 +3,7 @@ package com.example.Restaurantto.PDV.service.user;
 import com.example.Restaurantto.PDV.dto.user.CreateUserDTO;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
+import com.example.Restaurantto.PDV.dto.user.prospectingUserDTO;
 import com.example.Restaurantto.PDV.dto.user.UpdatePasswordDTO;
 import com.example.Restaurantto.PDV.dto.user.UserDTO;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
@@ -37,6 +38,24 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public void salvarUsuarioProspeccao(prospectingUserDTO prospectingUserDTO){
+        if(userRepository.findByEmail(prospectingUserDTO.email()).isPresent()){
+            throw new RuntimeException("E-MAIL JÁ CADASTRADO");
+        }
+        ModelUser newUser = ModelUser.builder()
+                .email(prospectingUserDTO.email())
+                .roles(List.of(ModelRole.builder().name(prospectingUserDTO.role()).build()))
+                .fullName(prospectingUserDTO.fullName())
+                .phone(prospectingUserDTO.phone())
+                .enterprise(prospectingUserDTO.enterprise())
+                .message(prospectingUserDTO.message())
+                .isProspecting(prospectingUserDTO.isProspecting())
+                .build();
+
+        userRepository.save(newUser);
+
+    }
+
     public void salvarUsuario(CreateUserDTO createUserDTO){
         if(userRepository.findByEmail(createUserDTO.email()).isPresent()){
             throw new RuntimeException("E-MAIL JÁ CADASTRADO");
@@ -45,8 +64,7 @@ public class UserService {
                 .email(createUserDTO.email())
                 .password(securityConfig.passwordEncoder().encode(createUserDTO.password()))
                 .roles(List.of(ModelRole.builder().name(createUserDTO.role()).build()))
-                .name(createUserDTO.name())
-                .lastName(createUserDTO.lastName())
+                .fullName(createUserDTO.fullName())
                 .phone(createUserDTO.phone())
                 .cpf(createUserDTO.cpf())
                 .cep(createUserDTO.cep())
@@ -62,8 +80,7 @@ public class UserService {
         ModelUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        user.setName(createUserDTO.name());
-        user.setLastName(createUserDTO.lastName());
+        user.setFullName(createUserDTO.fullName());
         user.setPhone(createUserDTO.phone());
         user.setCpf(createUserDTO.cpf());
         user.setCep(createUserDTO.cep());
@@ -116,8 +133,7 @@ public class UserService {
                         user.getRoles().stream()
                                 .map(ModelRole::getName)
                                 .collect(Collectors.toList()),
-                        user.getName(),
-                        user.getLastName(),
+                        user.getFullName(),
                         user.getPhone(),
                         user.getCpf(),
                         user.getCep(),

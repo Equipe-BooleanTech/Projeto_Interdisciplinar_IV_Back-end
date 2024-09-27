@@ -25,14 +25,27 @@ public class ModelUser {
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<ModelRole> roles;
-    private String name;
-    private String lastName;
+    private String fullName;
     private String phone;
-    @Column(unique = true)
+    @Column(unique = true, nullable = true)
     private String cpf;
     private String cep;
     private String address;
+    private int addressNumber;
     private String city;
     private String state;
     private String neighborhood;
+    private String enterprise;
+    private String cnpj;
+    private String message;
+    private boolean isProspecting;
+
+    public Boolean isReadyForActivation(){
+        return cep != null && address != null && addressNumber != 0 &&
+                city != null && state != null && neighborhood != null &&
+                cpf != null && cnpj != null && password != null;
+    }
+
+
+
 }
