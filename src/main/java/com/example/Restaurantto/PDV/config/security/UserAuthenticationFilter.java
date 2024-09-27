@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.security;
+package com.example.Restaurantto.PDV.config.security;
 
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;

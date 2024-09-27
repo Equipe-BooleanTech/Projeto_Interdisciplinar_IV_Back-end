@@ -2,21 +2,20 @@ package com.example.Restaurantto.PDV.dto.user;
 
 import com.example.Restaurantto.PDV.enums.Role;
 
-import java.util.List;
 import java.util.UUID;
 
 
-public record CreateUserDTO (UUID id,
-                             String email,
+public record CreateUserDTO (String email,
+                             String password,
                              Role role,
-                             String name,
-                             String lastName,
+                             String fullName,
                              String phone,
                              String cpf,
                              String cep,
                              String address,
+                             int addressNumber,
                              String city,
                              String state,
                              String neighborhood,
-                             String password){
+                             String cnpj){
 }
