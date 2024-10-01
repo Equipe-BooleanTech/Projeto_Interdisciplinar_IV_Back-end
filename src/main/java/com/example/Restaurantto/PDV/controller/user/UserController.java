@@ -1,13 +1,13 @@
 package com.example.Restaurantto.PDV.controller.user;
 
-import com.example.Restaurantto.PDV.dto.user.CreateUserDTO;
+import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
-import com.example.Restaurantto.PDV.dto.user.UpdatePasswordDTO;
-import com.example.Restaurantto.PDV.dto.user.UserDTO;
-import com.example.Restaurantto.PDV.dto.user.prospectingUserDTO;
 import com.example.Restaurantto.PDV.service.user.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,66 +23,69 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    // Endpoint de login com resposta personalizada de token JWT
     @PostMapping("/login")
-    public ResponseEntity<JwtTokenDTO> loginUsuario(@RequestBody LoginUserDTO loginUserDTO) {
+    public ResponseEntity<JwtTokenDTO> loginUsuario(@RequestBody @Valid LoginUserDTO loginUserDTO) {
         JwtTokenDTO token = userService.authenticarUsuario(loginUserDTO);
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        return ResponseEntity.ok(token);
     }
 
-
+    // Endpoint para criação de usuário completo, retornando o UUID do novo usuário
     @PostMapping("/create-complete")
-    public ResponseEntity<Void> salvarUsuario(@RequestBody CreateUserDTO createUserDTO) {
-        userService.salvarUsuario(createUserDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<UUID> salvarUsuario(@RequestBody @Valid CreateUserDTO createUserDTO) {
+        UUID id = userService.salvarUsuario(createUserDTO);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-
-    @PostMapping("/create-prospect")
-    public ResponseEntity<Void> salvarUsuarioProspeccao(@RequestBody prospectingUserDTO prospectingUserDTO) {
-        userService.salvarUsuarioProspeccao(prospectingUserDTO);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    // Endpoint para criação de usuário prospectivo
+    @PostMapping("/prospects")
+    public ResponseEntity<UUID> salvarUsuarioProspeccao(@RequestBody @Valid ProspectingUserDTO prospectingUserDTO) {
+        UUID id = userService.salvarUsuarioProspeccao(prospectingUserDTO);
+        return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-
-
+    // Ativar usuário, apenas para admins
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/activate/{id}")
-    public ResponseEntity<Void> ativarUsuario(@PathVariable UUID id, @RequestBody CreateUserDTO createUserDTO) {
+    public ResponseEntity<Void> ativarUsuario(@PathVariable UUID id, @RequestBody @Valid CreateUserDTO createUserDTO) {
         userService.ativarUsuario(id, createUserDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-
+    // Atualizar dados de um usuário existente
     @PutMapping("/update/{id}")
-    public ResponseEntity<Void> atualizarUsuario(@PathVariable UUID id, @RequestBody CreateUserDTO createUserDTO) {
+    public ResponseEntity<Void> atualizarUsuario(@PathVariable UUID id, @RequestBody @Valid CreateUserDTO createUserDTO) {
         userService.atualizarUsuario(id, createUserDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 
-
+    // Deletar um usuário, apenas para admins
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> removerUsuario(@PathVariable UUID id) {
         userService.deletarUsuario(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 
-
-
+    // Atualizar senha do usuário com validação
     @PutMapping("/update-password")
-    public ResponseEntity<Void> mudarSenha(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
+    public ResponseEntity<String> mudarSenha(@RequestBody @Valid UpdatePasswordDTO updatePasswordDTO) {
         userService.mudarSenha(updatePasswordDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok("Senha atualizada com sucesso!");
     }
 
-
+    // Listar todos os usuários com paginação
     @GetMapping("/get-users")
-    public ResponseEntity<List<UserDTO>> listarTodosUsuarios() {
-        List<UserDTO> users = userService.listarTodosUsuarios();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    public ResponseEntity<Page<UserDTO>> listarTodosUsuarios(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Page<UserDTO> users = (Page<UserDTO>) userService.listarTodosUsuarios(PageRequest.of(page, size));
+        return ResponseEntity.ok(users);
     }
 
-    @PostMapping("/update-role/{id}")
-    public ResponseEntity<Void> atualizarRole(@PathVariable UUID id, @RequestBody UserDTO userDTO) {
-        userService.atualizaRole(id, userDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+    // Atualizar roles de um usuário, apenas admins podem modificar
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/roles/{id}")
+    public ResponseEntity<Void> atualizarRoles(@PathVariable UUID id, @RequestBody @Valid UpdateRoleDTO updateRoleDTO) {
+        userService.atualizaRole(id, updateRoleDTO);
+        return ResponseEntity.ok().build();
     }
 }

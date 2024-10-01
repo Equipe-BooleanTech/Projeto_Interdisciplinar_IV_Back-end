@@ -4,6 +4,8 @@ import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
+import com.example.Restaurantto.PDV.exception.EmailAlreadyRegisteredException;
+import com.example.Restaurantto.PDV.exception.InvalidCredentialsException;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
@@ -12,9 +14,12 @@ import com.example.Restaurantto.PDV.config.security.SecurityConfig;
 
 import com.example.Restaurantto.PDV.service.auth.JwtTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,9 +41,9 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void salvarUsuarioProspeccao(prospectingUserDTO prospectingUserDTO){
+    public UUID salvarUsuarioProspeccao(ProspectingUserDTO prospectingUserDTO){
         if(userRepository.findByEmail(prospectingUserDTO.email()).isPresent()){
-            throw new RuntimeException("E-MAIL JÁ CADASTRADO");
+            throw new EmailAlreadyRegisteredException("E-MAIL JÁ CADASTRADO");
         }
         ModelUser newUser = ModelUser.builder()
                 .email(prospectingUserDTO.email())
@@ -60,6 +65,7 @@ public class UserService {
 
         userRepository.save(newUser);
 
+        return newUser.getId();
     }
 
     public void ativarUsuario(UUID id, CreateUserDTO createUserDTO){
@@ -90,9 +96,9 @@ public class UserService {
     }
 
 
-    public void salvarUsuario(CreateUserDTO createUserDTO){
+    public UUID salvarUsuario(CreateUserDTO createUserDTO){
         if(userRepository.findByEmail(createUserDTO.email()).isPresent()){
-            throw new RuntimeException("E-MAIL JÁ CADASTRADO");
+            throw new EmailAlreadyRegisteredException("E-MAIL JÁ CADASTRADO");
         }
         ModelUser newUser = ModelUser.builder()
                 .email(createUserDTO.email())
@@ -108,6 +114,7 @@ public class UserService {
                 .neighborhood(createUserDTO.neighborhood())
                 .build();
         userRepository.save(newUser);
+        return null;
     }
 
     public void atualizarUsuario(UUID id, CreateUserDTO createUserDTO){
@@ -126,31 +133,47 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void atualizaRole(UUID id, UserDTO userDTO){
+    public void atualizaRole(UUID id, UpdateRoleDTO updateRoleDTO) {
         ModelUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        user.setRoles(List.of(ModelRole.builder().name(userDTO.role()).build()));
-        userRepository.save(user);
+        List<ModelRole> rolesAtualizadas = updateRoleDTO.getRoles().stream()
+                .map(role -> ModelRole.builder().name(role).build())
+                .collect(Collectors.toList());
 
+        user.setRoles(rolesAtualizadas);
+
+        userRepository.save(user);
     }
+
     public void deletarUsuario(UUID id){
         if(!userRepository.existsById(id)){
             throw new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO");
         }
         userRepository.deleteById(id);
     }
-    public void mudarSenha(UpdatePasswordDTO updatePasswordDTO){
+    public void mudarSenha(UpdatePasswordDTO updatePasswordDTO) {
         ModelUser user = userRepository.findByEmail(updatePasswordDTO.email())
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        if(!passwordEncoder.matches(updatePasswordDTO.currentPassword(), user.getPassword())){
+        if (!passwordEncoder.matches(updatePasswordDTO.currentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("SENHA ATUAL INCORRETA");
         }
+
+        // Validação extra para garantir que a nova senha siga critérios de segurança
+        if (!isPasswordStrong(updatePasswordDTO.newPassword())) {
+            throw new IllegalArgumentException("A NOVA SENHA NÃO ATENDE AOS CRITÉRIOS DE SEGURANÇA");
+        }
+
         user.setPassword(passwordEncoder.encode(updatePasswordDTO.newPassword()));
         userRepository.save(user);
-
     }
+
+    private boolean isPasswordStrong(String password) {
+        // Exemplo simples de validação de senha
+        return password.length() >= 8 && password.matches(".*[!@#$%^&*()].*");
+    }
+
     public JwtTokenDTO authenticarUsuario(LoginUserDTO loginUserDTO){
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 loginUserDTO.email(),
@@ -162,32 +185,40 @@ public class UserService {
             String token = jwtTokenService.generateToken(modelUserDetails);
             return new JwtTokenDTO(token);
 
+        } catch (AuthenticationException e) {
+            throw new InvalidCredentialsException("FALHA NA AUTENTICAÇÃO: CREDENCIAIS INVÁLIDAS");
         } catch (Exception e) {
-            throw new RuntimeException("FALHA NA AUTENTICAÇÃO: " + e.getMessage());
+            throw new RuntimeException("ERRO INESPERADO NA AUTENTICAÇÃO: " + e.getMessage());
         }
     }
 
-    public List<UserDTO> listarTodosUsuarios(){
-        List<ModelUser> users = userRepository.findAll();
-        return users.stream()
-                .map( user -> new UserDTO(user.getId(),
-                        user.getEmail(),
-                        user.getRoles().stream()
-                                .map(ModelRole::getName)
-                                .collect(Collectors.toList()),
-                        user.getFullName(),
-                        user.getPhone(),
-                        user.getCpf(),
-                        user.getCep(),
-                        user.getAddress(),
-                        user.getAddressNumber(),
-                        user.getCity(),
-                        user.getState(),
-                        user.getNeighborhood(),
-                        user.getCnpj(),
-                        user.getMessage(),
-                        user.getIsProspecting(),
-                        user.getPassword()))
-                .collect(Collectors.toList());
+    private UserDTO mapToUserDTO(ModelUser user) {
+        return new UserDTO(
+                user.getId(),
+                user.getEmail(),
+                user.getRoles().stream()
+                        .map(ModelRole::getName)
+                        .collect(Collectors.toList()),
+                user.getFullName(),
+                user.getPhone(),
+                user.getCpf(),
+                user.getCep(),
+                user.getAddress(),
+                user.getAddressNumber(),
+                user.getCity(),
+                user.getState(),
+                user.getNeighborhood(),
+                user.getCnpj(),
+                user.getMessage(),
+                user.getEnterprise(),
+                user.getIsProspecting(),
+                user.getPassword()
+        );
     }
+
+    public Page<UserDTO> listarTodosUsuarios(PageRequest pageRequest) {
+        return userRepository.findAll(pageRequest)
+                .map(this::mapToUserDTO);
+    }
+
 }
