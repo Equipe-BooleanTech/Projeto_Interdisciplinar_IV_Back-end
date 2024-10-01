@@ -63,7 +63,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean verificaEndpointsPublicos(HttpServletRequest request){
         String requestURI = request.getRequestURI();
-        return Arrays.asList("/api/users/login","/api/users/create")
+        return Arrays.asList("/api/users/login","/api/users/create-prospect")
                 .contains(requestURI);
     }
 

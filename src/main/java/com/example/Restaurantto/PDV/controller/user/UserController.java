@@ -79,4 +79,10 @@ public class UserController {
         List<UserDTO> users = userService.listarTodosUsuarios();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+    @PostMapping("/update-role/{id}")
+    public ResponseEntity<Void> atualizarRole(@PathVariable UUID id, @RequestBody UserDTO userDTO) {
+        userService.atualizaRole(id, userDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

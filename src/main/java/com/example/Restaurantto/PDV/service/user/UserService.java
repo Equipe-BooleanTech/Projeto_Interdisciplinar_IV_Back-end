@@ -1,11 +1,8 @@
 package com.example.Restaurantto.PDV.service.user;
 
-import com.example.Restaurantto.PDV.dto.user.CreateUserDTO;
+import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
-import com.example.Restaurantto.PDV.dto.user.prospectingUserDTO;
-import com.example.Restaurantto.PDV.dto.user.UpdatePasswordDTO;
-import com.example.Restaurantto.PDV.dto.user.UserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
@@ -54,6 +51,7 @@ public class UserService {
                 .cpf(null)
                 .cep(null)
                 .address(null)
+                .addressNumber(0)
                 .city(null)
                 .state(null)
                 .neighborhood(null)
@@ -80,7 +78,7 @@ public class UserService {
         user.setNeighborhood(createUserDTO.neighborhood());
         user.setCnpj(createUserDTO.cnpj());
 
-        user.setRoles(List.of(ModelRole.builder().name(Role.ROLE_GERENTE).build()));
+        user.setRoles(List.of(ModelRole.builder().name(Role.ROLE_USER).build()));
         user.setProspecting(false);
 
         if (createUserDTO.password() != null){
@@ -128,6 +126,14 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public void atualizaRole(UUID id, UserDTO userDTO){
+        ModelUser user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
+
+        user.setRoles(List.of(ModelRole.builder().name(userDTO.role()).build()));
+        userRepository.save(user);
+
+    }
     public void deletarUsuario(UUID id){
         if(!userRepository.existsById(id)){
             throw new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO");
@@ -174,9 +180,13 @@ public class UserService {
                         user.getCpf(),
                         user.getCep(),
                         user.getAddress(),
+                        user.getAddressNumber(),
                         user.getCity(),
                         user.getState(),
                         user.getNeighborhood(),
+                        user.getCnpj(),
+                        user.getMessage(),
+                        user.getIsProspecting(),
                         user.getPassword()))
                 .collect(Collectors.toList());
     }

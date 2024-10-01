@@ -29,6 +29,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/login", "/api/users/create-prospect").permitAll()
                         .requestMatchers("/api/users/update/**", "/api/users/delete/**", "/api/users/update-password").authenticated()
                         .requestMatchers("/api/users/get-users","/api/users/create-complete","/activate/**").hasAnyRole("GERENTE", "ADMIN")
+                        .requestMatchers("/api/user/update-role/**").hasRole("ADMIN")
                         .anyRequest().denyAll()
                 )
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
