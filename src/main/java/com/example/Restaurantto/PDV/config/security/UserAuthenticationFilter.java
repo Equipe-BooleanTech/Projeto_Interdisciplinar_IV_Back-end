@@ -63,7 +63,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean verificaEndpointsPublicos(HttpServletRequest request){
         String requestURI = request.getRequestURI();
-        return Arrays.asList("/api/users/login","/api/users/prospects")
+        return Arrays.asList("/api/users/login","/api/users/prospects","/swagger-ui")
                 .contains(requestURI);
     }
 
