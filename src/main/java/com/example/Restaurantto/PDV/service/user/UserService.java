@@ -137,8 +137,8 @@ public class UserService {
         ModelUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        List<ModelRole> rolesAtualizadas = updateRoleDTO.getRoles().stream()
-                .map(role -> ModelRole.builder().name(role).build())
+        List<ModelRole> rolesAtualizadas = updateRoleDTO.roles().stream()
+                .map(role -> ModelRole.builder().name(Role.valueOf(role)).build())
                 .collect(Collectors.toList());
 
         user.setRoles(rolesAtualizadas);
@@ -160,7 +160,6 @@ public class UserService {
             throw new IllegalArgumentException("SENHA ATUAL INCORRETA");
         }
 
-        // Validação extra para garantir que a nova senha siga critérios de segurança
         if (!isPasswordStrong(updatePasswordDTO.newPassword())) {
             throw new IllegalArgumentException("A NOVA SENHA NÃO ATENDE AOS CRITÉRIOS DE SEGURANÇA");
         }
@@ -170,8 +169,7 @@ public class UserService {
     }
 
     private boolean isPasswordStrong(String password) {
-        // Exemplo simples de validação de senha
-        return password.length() >= 8 && password.matches(".*[!@#$%^&*()].*");
+        return password.length() >= 8 && password.matches(".*[!@#$%^&*()].*"); //Aqui a senha tem que ter ate 8 letras ou numeros e tem que ter um especial
     }
 
     public JwtTokenDTO authenticarUsuario(LoginUserDTO loginUserDTO){
@@ -211,7 +209,7 @@ public class UserService {
                 user.getCnpj(),
                 user.getMessage(),
                 user.getEnterprise(),
-                user.getIsProspecting(),
+                user.isProspecting(),
                 user.getPassword()
         );
     }
