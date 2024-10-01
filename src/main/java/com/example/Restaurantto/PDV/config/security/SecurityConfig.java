@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // Desabilita CSRF para APIs REST
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/users/login", "/api/users/prospects").permitAll()
+                        .requestMatchers("/api/users/login", "/api/users/prospects", "/swagger-ui").permitAll()
                         .requestMatchers("/api/users/update/**", "/api/users/delete/**", "/api/users/update-password").authenticated()
                         .requestMatchers("/api/users/get-users","/api/users/create-complete","/activate/**").hasAnyRole("GERENTE", "ADMIN")
                         .requestMatchers("/api/user/roles/**").hasRole("ADMIN")
