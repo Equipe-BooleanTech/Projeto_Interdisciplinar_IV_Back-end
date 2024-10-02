@@ -22,7 +22,7 @@ public class ModelUser {
     @Column(unique = true)
     private String email;
     private String password;
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<ModelRole> roles;
     private String fullName;
@@ -40,12 +40,10 @@ public class ModelUser {
     private String message;
     private boolean isProspecting;
 
-    public Boolean isReadyForActivation(){
+    public Boolean isReadyForActivation() {
         return cep != null && address != null && addressNumber != 0 &&
                 city != null && state != null && neighborhood != null &&
                 cpf != null && cnpj != null && password != null;
     }
-
-
 
 }

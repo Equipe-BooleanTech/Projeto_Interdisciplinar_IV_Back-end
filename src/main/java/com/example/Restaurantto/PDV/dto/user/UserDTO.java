@@ -14,8 +14,13 @@ public record UserDTO(UUID id,
                       String cpf,
                       String cep,
                       String address,
+                      int addressNumber,
                       String city,
                       String state,
                       String neighborhood,
+                      String cnpj,
+                      String message,
+                      String enterprise,
+                      Boolean isProspecting,
                       @JsonIgnore String password) {
 }
