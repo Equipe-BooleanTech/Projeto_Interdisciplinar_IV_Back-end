@@ -61,12 +61,11 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request,response);
     }
 
-    private boolean verificaEndpointsPublicos(HttpServletRequest request){
+    private boolean verificaEndpointsPublicos(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        return Arrays.asList("/api/users/login","/api/users/prospects","/swagger-ui")
-                .contains(requestURI);
+        return requestURI.startsWith("/swagger-ui") || requestURI.startsWith("/v3/api-docs")
+                || requestURI.equals("/api/users/login") || requestURI.equals("/api/users/prospects");
     }
-
     private String recuperaToken(HttpServletRequest request){
         String authHeader = request.getHeader("Authorization");
         if(authHeader != null && authHeader.startsWith("Bearer ")){

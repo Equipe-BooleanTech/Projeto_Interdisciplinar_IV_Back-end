@@ -109,12 +109,18 @@ public class UserService {
                 .cpf(createUserDTO.cpf())
                 .cep(createUserDTO.cep())
                 .address(createUserDTO.address())
+                .addressNumber(createUserDTO.addressNumber())
                 .city(createUserDTO.city())
                 .state(createUserDTO.state())
                 .neighborhood(createUserDTO.neighborhood())
+                .cnpj(createUserDTO.cnpj())
+                .message(createUserDTO.message())
+                .enterprise(createUserDTO.enterprise())
+                .isProspecting(createUserDTO.isProspecting())
                 .build();
         userRepository.save(newUser);
-        return null;
+
+        return newUser.getId();
     }
 
     public void atualizarUsuario(UUID id, CreateUserDTO createUserDTO){

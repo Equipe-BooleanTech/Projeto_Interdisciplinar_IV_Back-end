@@ -4,8 +4,7 @@ import com.example.Restaurantto.PDV.enums.Role;
 
 import java.util.UUID;
 
-public record ProspectingUserDTO(UUID id,
-                                 String email,
+public record ProspectingUserDTO(String email,
                                  Role role,
                                  String fullName,
                                  String phone,
