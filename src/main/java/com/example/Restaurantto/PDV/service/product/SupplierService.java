@@ -1,5 +1,6 @@
 package com.example.Restaurantto.PDV.service.product;
 
+import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
 import com.example.Restaurantto.PDV.dto.user.UserDTO;
 import com.example.Restaurantto.PDV.exception.product.SupplierAlreadyRegisteredException;
@@ -55,14 +56,15 @@ public class SupplierService {
         supplierRepository.deleteById(id);
     }
 
-    private SupplierDTO listarFornecedor(Supplier supplier) {
-        return new SupplierDTO(supplier.getName(),
+    private GetSupplierDTO listarFornecedor(Supplier supplier) {
+        return new GetSupplierDTO(supplier.getId(),
+                supplier.getName(),
                 supplier.getCnpj(),
                 supplier.getContact(),
                 supplier.getPhone());
     }
 
-    public Page<SupplierDTO> listarTodosFornecedores(PageRequest pageRequest) {
+    public Page<GetSupplierDTO> listarTodosFornecedores(PageRequest pageRequest) {
         return supplierRepository.findAll(pageRequest)
                 .map(this::listarFornecedor);
 
