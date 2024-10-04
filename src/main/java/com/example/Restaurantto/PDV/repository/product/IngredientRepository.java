@@ -7,4 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, UUID> {
+
 }
