@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.exception;
+package com.example.Restaurantto.PDV.exception.user;
 
 public class EmailAlreadyRegisteredException extends RuntimeException{
 
