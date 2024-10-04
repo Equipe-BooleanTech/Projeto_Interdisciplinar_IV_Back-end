@@ -6,7 +6,7 @@ import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
 import com.example.Restaurantto.PDV.service.product.IngredientService;
 import com.example.Restaurantto.PDV.service.product.SupplierService;
 import jakarta.validation.Valid;
-import org.hibernate.query.Page;
+import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
