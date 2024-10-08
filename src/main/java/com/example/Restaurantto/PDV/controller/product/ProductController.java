@@ -3,6 +3,8 @@ package com.example.Restaurantto.PDV.controller.product;
 import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
+import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
+import com.example.Restaurantto.PDV.response.SuccessResponse;
 import com.example.Restaurantto.PDV.service.product.IngredientService;
 import com.example.Restaurantto.PDV.service.product.SupplierService;
 import jakarta.validation.Valid;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -30,9 +33,16 @@ public class ProductController {
     }
 
     @PostMapping("/create-ingredient")
-    public ResponseEntity<UUID> salvarIngrediente(@RequestBody @Valid IngredientDTO ingredientDTO){
-        UUID id = ingredientService.salvarIngrediente(ingredientDTO);
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
+    public ResponseEntity<SuccessResponse> salvarIngrediente(@RequestBody @Valid IngredientDTO ingredientDTO){
+        try{
+            UUID id = ingredientService.salvarIngrediente(ingredientDTO);
+            SuccessResponse response = new SuccessResponse("INGREDIENTE CRIADO COM SUCESSO!", id);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }catch (SupplierNotFoundException e){
+            throw e;
+        }
+
+
     }
 
     @PutMapping("/update-supplier/{id}")
