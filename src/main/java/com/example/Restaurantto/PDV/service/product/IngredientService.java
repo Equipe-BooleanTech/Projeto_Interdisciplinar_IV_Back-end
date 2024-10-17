@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class IngredientService {
     @Autowired
     private IngredientRepository ingredientRepository;
-
+    @Autowired
     private SupplierRepository supplierRepository;
 
     public UUID salvarIngrediente(IngredientDTO ingredientDTO) {
