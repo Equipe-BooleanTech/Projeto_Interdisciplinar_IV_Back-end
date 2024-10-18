@@ -1,8 +1,6 @@
 package com.example.Restaurantto.PDV.response;
 
-import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
-import com.example.Restaurantto.PDV.exception.product.SupplierAlreadyRegisteredException;
-import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
+import com.example.Restaurantto.PDV.exception.product.*;
 import com.example.Restaurantto.PDV.exception.user.EmailAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.user.InvalidCredentialsException;
 import org.springframework.http.HttpStatus;
@@ -65,5 +63,66 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleSupplierCreationFailedException(SupplierCreationFailedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleIngredientCreationFailedException(IngredientCreationFailedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleSupplierUpdateFailedException(SupplierUpdateFailedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleIngredientUpdateFailedException(IngredientUpdateFailedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleSupplierDeletionFailedException(SupplierDeletionFailedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleIngredientDeletionFailedException(IngredientDeletionFailedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
+
 
 }

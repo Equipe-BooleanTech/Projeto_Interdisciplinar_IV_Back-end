@@ -3,8 +3,9 @@ package com.example.Restaurantto.PDV.controller.product;
 import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
-import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
+import com.example.Restaurantto.PDV.exception.product.*;
 import com.example.Restaurantto.PDV.response.SuccessResponse;
+import com.example.Restaurantto.PDV.response.UpdateResponse;
 import com.example.Restaurantto.PDV.service.product.IngredientService;
 import com.example.Restaurantto.PDV.service.product.SupplierService;
 import jakarta.validation.Valid;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -27,9 +27,14 @@ public class ProductController {
     private IngredientService ingredientService;
 
     @PostMapping("/create-supplier")
-    public ResponseEntity<UUID> salvarFornecedor(@RequestBody @Valid SupplierDTO supplierDTO){
-        UUID id = supplierService.salvarFornecedor(supplierDTO);
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
+    public ResponseEntity<SuccessResponse> salvarFornecedor(@RequestBody @Valid SupplierDTO supplierDTO){
+        try {
+            UUID id = supplierService.salvarFornecedor(supplierDTO);
+            SuccessResponse response = new SuccessResponse("FORNECEDOR CRIADO COM SUCESSO!", id);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }catch (SupplierCreationFailedException e){
+            throw e;
+        }
     }
 
     @PostMapping("/create-ingredient")
@@ -38,7 +43,7 @@ public class ProductController {
             UUID id = ingredientService.salvarIngrediente(ingredientDTO);
             SuccessResponse response = new SuccessResponse("INGREDIENTE CRIADO COM SUCESSO!", id);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
-        }catch (SupplierNotFoundException e){
+        }catch (IngredientCreationFailedException e){
             throw e;
         }
 
@@ -46,27 +51,48 @@ public class ProductController {
     }
 
     @PutMapping("/update-supplier/{id}")
-    public ResponseEntity<Void> atualizarFornecedor(@PathVariable UUID id, @RequestBody @Valid SupplierDTO supplierDTO){
-        supplierService.atualizarFornecedor(id, supplierDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UpdateResponse> atualizarFornecedor(@PathVariable UUID id, @RequestBody @Valid SupplierDTO supplierDTO){
+        try {
+            supplierService.atualizarFornecedor(id, supplierDTO);
+
+            UpdateResponse response = new UpdateResponse("FORNECEDOR ATUALIZADO COM SUCESSO!");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (SupplierUpdateFailedException e){
+            throw e;
+        }
     }
 
     @PutMapping("/update-ingredient/{id}")
-    public ResponseEntity<Void> atualizarIngrediente(@PathVariable UUID id, @RequestBody @Valid IngredientDTO ingredientDTO){
-        ingredientService.atualizarIngrediente(id, ingredientDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UpdateResponse> atualizarIngrediente(@PathVariable UUID id, @RequestBody @Valid IngredientDTO ingredientDTO){
+       try {
+           ingredientService.atualizarIngrediente(id, ingredientDTO);
+           UpdateResponse response = new UpdateResponse("INGREDIENTE ATUALIZADO COM SUCESSO!");
+           return new ResponseEntity<>(response, HttpStatus.OK);
+       }catch (IngredientUpdateFailedException e){
+           throw e;
+       }
     }
 
     @DeleteMapping("/delete-supplier/{id}")
-    public ResponseEntity<Void> deletarFornecedor(@PathVariable UUID id){
-        supplierService.deletarFornecedor(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<SuccessResponse> deletarFornecedor(@PathVariable UUID id){
+        try {
+            supplierService.deletarFornecedor(id);
+            SuccessResponse response = new SuccessResponse("FORNECEDOR DELETADO COM SUCESSO!", id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (SupplierDeletionFailedException e){
+            throw e;
+        }
     }
 
     @DeleteMapping("/delete-ingredient/{id}")
-    public ResponseEntity<Void> deletarIngrediente(@PathVariable UUID id){
-        ingredientService.deletarIngrediente(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<SuccessResponse> deletarIngrediente(@PathVariable UUID id){
+        try {
+            ingredientService.deletarIngrediente(id);
+            SuccessResponse response = new SuccessResponse("INGREDIENTE DELETADO COM SUCESSO!", id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (IngredientDeletionFailedException e){
+            throw e;
+        }
     }
 
     @GetMapping("/get-supplier")
