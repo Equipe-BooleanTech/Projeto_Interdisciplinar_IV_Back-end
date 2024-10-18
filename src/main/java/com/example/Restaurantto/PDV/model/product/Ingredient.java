@@ -26,8 +26,10 @@ public class Ingredient {
             inverseJoinColumns = @JoinColumn(name = "supplier_id")
     )
     private Set<Supplier> suppliers;
-    String name;
-    double price;
+    private String name;
+    private double price;
+    private String unit;
+    private double quantity;
     private String description;
     private Boolean isAnimalOrigin;
     private String sif;

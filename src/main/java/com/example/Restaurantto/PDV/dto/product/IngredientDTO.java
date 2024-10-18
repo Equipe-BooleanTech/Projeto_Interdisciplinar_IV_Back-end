@@ -8,6 +8,8 @@ import java.util.Set;
 public record IngredientDTO(String name,
                             Set<Supplier> supplier,
                             Double price,
+                            String unit,
+                            Double quantity,
                             String description,
                             Boolean isAnimalOrigin,
                             String sif

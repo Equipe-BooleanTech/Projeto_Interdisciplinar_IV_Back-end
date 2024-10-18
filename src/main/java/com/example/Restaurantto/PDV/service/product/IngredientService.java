@@ -34,6 +34,8 @@ public class IngredientService {
                 .name(ingredientDTO.name())
                 .suppliers(suppliers)
                 .price(ingredientDTO.price())
+                .unit(ingredientDTO.unit())
+                .quantity(ingredientDTO.quantity())
                 .description(ingredientDTO.description())
                 .isAnimalOrigin(ingredientDTO.isAnimalOrigin())
                 .sif(ingredientDTO.sif())
@@ -56,6 +58,8 @@ public class IngredientService {
         ingredient.setName(ingredientDTO.name());
         ingredient.setSuppliers(suppliers);
         ingredient.setPrice(ingredientDTO.price());
+        ingredient.setUnit(ingredientDTO.unit());
+        ingredient.setQuantity(ingredientDTO.quantity());
         ingredient.setDescription(ingredientDTO.description());
         ingredient.setIsAnimalOrigin(ingredientDTO.isAnimalOrigin());
         ingredient.setSif(ingredientDTO.sif());
@@ -73,6 +77,8 @@ public class IngredientService {
         return new IngredientDTO(ingredient.getName(),
                 ingredient.getSuppliers(),
                 ingredient.getPrice(),
+                ingredient.getUnit(),
+                ingredient.getQuantity(),
                 ingredient.getDescription(),
                 ingredient.getIsAnimalOrigin(),
                 ingredient.getSif());
