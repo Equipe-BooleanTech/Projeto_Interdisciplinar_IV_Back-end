@@ -26,15 +26,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // Desabilita CSRF para APIs REST
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/users/login",
+                        .requestMatchers(
+                                "/api/users/login",
                                 "/api/users/prospects",
                                 "/swagger-ui",
                                 "/swagger-ui/**",
-                                "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/users/update/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/users/update/**",
                                 "/api/users/delete/**",
                                 "/api/users/update-password").authenticated()
-                        .requestMatchers("/api/users/get-users",
+                        .requestMatchers(
+                                "/api/users/get-users",
                                 "/activate/**",
                                 "/api/products/create-supplier",
                                 "/api/products/create-ingredient",
@@ -43,9 +47,18 @@ public class SecurityConfig {
                                 "/api/products/delete-supplier/{id}",
                                 "/api/products/delete-ingredient/{id}",
                                 "/api/products/get-supplier",
-                                "/api/products/get-ingredients").hasAnyRole("GERENTE", "ADMIN")
-                        .requestMatchers("/api/user/roles/**",
-                                "/api/users/create-complete").hasRole("ADMIN")
+                                "/api/products/get-ingredients",
+                                "/api/datasheets/create-datasheet",
+                                "/api/datasheets/update-datasheet/{id}",
+                                "/api/datasheets/delete-datasheet/{id}",
+                                "/api/datasheets/get-datasheets"
+                        ).hasAnyRole(
+                                "GERENTE", "ADMIN"
+                        )
+                        .requestMatchers(
+                                "/api/user/roles/**",
+                                "/api/users/create-complete"
+                        ).hasRole("ADMIN")
                         .anyRequest().denyAll()
                 )
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
