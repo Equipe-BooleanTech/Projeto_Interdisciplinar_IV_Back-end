@@ -1,14 +1,11 @@
 package com.example.Restaurantto.PDV.config.security;
 
-import jakarta.servlet.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +26,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/login",
                                 "/api/users/prospects",
+                                "/api/users/create-complete",
                                 "/swagger-ui",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
@@ -47,17 +45,20 @@ public class SecurityConfig {
                                 "/api/products/delete-supplier/{id}",
                                 "/api/products/delete-ingredient/{id}",
                                 "/api/products/get-supplier",
-                                "/api/products/get-ingredients",
+                                "/api/products/get-ingredients"
+                        ).hasAnyRole(
+                                "GERENTE", "ADMIN"
+                        )
+                        .requestMatchers(
                                 "/api/datasheets/create-datasheet",
                                 "/api/datasheets/update-datasheet/{id}",
                                 "/api/datasheets/delete-datasheet/{id}",
                                 "/api/datasheets/get-datasheets"
                         ).hasAnyRole(
-                                "GERENTE", "ADMIN"
+                                "CHEF", "ADMIN"
                         )
                         .requestMatchers(
-                                "/api/user/roles/**",
-                                "/api/users/create-complete"
+                                "/api/user/roles/**"
                         ).hasRole("ADMIN")
                         .anyRequest().denyAll()
                 )

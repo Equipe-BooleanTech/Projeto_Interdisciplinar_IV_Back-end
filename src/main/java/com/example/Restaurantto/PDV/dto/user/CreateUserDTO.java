@@ -23,5 +23,7 @@ public record CreateUserDTO (
                              String message,
                              String enterprise,
                              Boolean isProspecting,
-                             String password){
+                             String password,
+                             Boolean isEmployee,
+                             String function){
 }

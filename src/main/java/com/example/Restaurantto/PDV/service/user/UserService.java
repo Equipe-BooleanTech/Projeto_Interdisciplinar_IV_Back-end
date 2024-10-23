@@ -53,6 +53,7 @@ public class UserService {
                 .enterprise(prospectingUserDTO.enterprise())
                 .message(prospectingUserDTO.message())
                 .isProspecting(true)
+                .isEmployee(false)
                 .cpf(null)
                 .cep(null)
                 .address(null)
@@ -117,6 +118,8 @@ public class UserService {
                 .message(createUserDTO.message())
                 .enterprise(createUserDTO.enterprise())
                 .isProspecting(createUserDTO.isProspecting())
+                .isEmployee(createUserDTO.isEmployee())
+                .function(createUserDTO.function())
                 .build();
         userRepository.save(newUser);
 
@@ -135,6 +138,9 @@ public class UserService {
         user.setCity(createUserDTO.city());
         user.setState(createUserDTO.state());
         user.setNeighborhood(createUserDTO.neighborhood());
+        user.setFunction(createUserDTO.function());
+        user.setCnpj(createUserDTO.cnpj());
+        user.setEmployee(createUserDTO.isEmployee());
 
         userRepository.save(user);
     }
@@ -216,6 +222,8 @@ public class UserService {
                 user.getMessage(),
                 user.getEnterprise(),
                 user.isProspecting(),
+                user.isEmployee(),
+                user.getFunction(),
                 user.getPassword()
         );
     }

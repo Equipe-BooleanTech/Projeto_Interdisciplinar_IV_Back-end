@@ -10,5 +10,6 @@ public record ProspectingUserDTO(String email,
                                  String phone,
                                  String enterprise,
                                  String message,
-                                 boolean isProspecting){
+                                 boolean isProspecting,
+                                 boolean isEmployee){
 }
