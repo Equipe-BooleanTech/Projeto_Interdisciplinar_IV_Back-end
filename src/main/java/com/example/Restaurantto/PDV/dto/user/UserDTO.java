@@ -22,5 +22,7 @@ public record UserDTO(UUID id,
                       String message,
                       String enterprise,
                       Boolean isProspecting,
+                      Boolean isEmployee,
+                      String function,
                       @JsonIgnore String password) {
 }

@@ -39,11 +39,28 @@ public class ModelUser {
     private String cnpj;
     private String message;
     private boolean isProspecting;
+    private boolean isEmployee;
+    private String function;
 
     public Boolean isReadyForActivation() {
-        return cep != null && address != null && addressNumber != 0 &&
-                city != null && state != null && neighborhood != null &&
-                cpf != null && cnpj != null && password != null;
+        if (!isEmployee) {
+            boolean isReady = cep != null && address != null && addressNumber != 0 &&
+                    city != null && state != null && neighborhood != null &&
+                    cpf != null && cnpj != null && password != null;
+
+            if (isReady) {
+                System.out.println("Usuário pronto para ativação");
+                return true;
+            } else {
+                System.out.println("Usuário não está pronto para ativação");
+                return false;
+            }
+        } else {
+            System.out.println("Ativação não permitida: o usuário é um funcionário.");
+            return false;
+        }
     }
 
+
 }
+
