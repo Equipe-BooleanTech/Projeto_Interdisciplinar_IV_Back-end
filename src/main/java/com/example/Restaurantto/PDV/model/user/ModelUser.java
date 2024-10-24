@@ -42,24 +42,31 @@ public class ModelUser {
     private boolean isEmployee;
     private String function;
 
-    public Boolean isReadyForActivation() {
-        if (!isEmployee) {
-            boolean isReady = cep != null && address != null && addressNumber != 0 &&
-                    city != null && state != null && neighborhood != null &&
-                    cpf != null && cnpj != null && password != null;
+public Boolean isReadyForActivation() {
 
-            if (isReady) {
-                System.out.println("Usuário pronto para ativação");
-                return true;
-            } else {
-                System.out.println("Usuário não está pronto para ativação");
-                return false;
-            }
+    if (!isEmployee) {
+
+        boolean isReady = isValidString(cep) && isValidString(address) && addressNumber > 0 &&
+                isValidString(city) && isValidString(state) && isValidString(neighborhood) &&
+                isValidString(password) &&
+                (isValidString(cpf) || isValidString(cnpj)); 
+
+        if (isReady) {
+            System.out.println("Usuário pronto para ativação");
+            return true;
         } else {
-            System.out.println("Ativação não permitida: o usuário é um funcionário.");
+            System.out.println("Usuário não está pronto para ativação");
             return false;
         }
+    } else {
+        System.out.println("Ativação não permitida: o usuário é um funcionário.");
+        return false;
     }
+}
+
+private boolean isValidString(String value) {
+    return value != null && !value.trim().isEmpty();
+}
 
 
 }
