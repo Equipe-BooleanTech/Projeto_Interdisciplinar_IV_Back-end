@@ -64,7 +64,7 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     private boolean verificaEndpointsPublicos(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         return requestURI.startsWith("/swagger-ui") || requestURI.startsWith("/v3/api-docs")
-                || requestURI.equals("/api/users/login") || requestURI.equals("/api/users/prospects") || requestURI.equals("/api/users/activate/**");
+                || requestURI.equals("/api/users/login") || requestURI.equals("/api/users/prospects") || requestURI.startsWith("/api/users/activate/");
     }
     private String recuperaToken(HttpServletRequest request){
         String authHeader = request.getHeader("Authorization");
