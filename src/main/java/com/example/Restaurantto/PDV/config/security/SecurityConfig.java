@@ -26,7 +26,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/login",
                                 "/api/users/prospects",
-                                "/api/users/create-complete",
+                                "/activate/**",
                                 "/swagger-ui",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 "/api/users/update-password").authenticated()
                         .requestMatchers(
                                 "/api/users/get-users",
-                                "/activate/**",
+                                "/api/users/create-complete",
                                 "/api/products/create-supplier",
                                 "/api/products/create-ingredient",
                                 "/api/products/update-supplier/{id}",
