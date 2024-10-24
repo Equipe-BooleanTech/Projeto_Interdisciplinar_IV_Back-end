@@ -69,32 +69,46 @@ public class UserService {
         return newUser.getId();
     }
 
-    public void ativarUsuario(UUID id, CreateUserDTO createUserDTO){
-        ModelUser user = userRepository.findById(id)
-                .orElseThrow(()-> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
-        if(!user.isReadyForActivation()){
-            throw new IllegalArgumentException("INFORMAÇÕES INCOMPLETAS PARA ATIVAÇÃO");
-        }
+   public void ativarUsuario(UUID id, CreateUserDTO createUserDTO) {
 
-        user.setCpf(createUserDTO.cpf());
-        user.setCep(createUserDTO.cep());
-        user.setAddress(createUserDTO.address());
-        user.setAddressNumber(createUserDTO.addressNumber());
-        user.setCity(createUserDTO.city());
-        user.setState(createUserDTO.state());
-        user.setNeighborhood(createUserDTO.neighborhood());
-        user.setCnpj(createUserDTO.cnpj());
+    ModelUser user = userRepository.findById(id)
+            .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        user.setRoles(List.of(ModelRole.builder().name(Role.ROLE_USER).build()));
-        user.setProspecting(false);
-
-        if (createUserDTO.password() != null){
-            user.setPassword(passwordEncoder.encode(createUserDTO.password()));
-        }else {
-            throw new IllegalArgumentException("SENHA OBRIGATÓRIA NA ATIVAÇÃO");
-        }
-        userRepository.save(user);
+    
+    if (!user.isReadyForActivation()) {
+        throw new IllegalArgumentException("USUÁRIO NÃO ESTÁ APTO PARA ATIVAÇÃO");
     }
+
+
+    user.setCpf(createUserDTO.cpf());
+    user.setCep(createUserDTO.cep());
+    user.setAddress(createUserDTO.address());
+    user.setAddressNumber(createUserDTO.addressNumber());
+    user.setCity(createUserDTO.city());
+    user.setState(createUserDTO.state());
+    user.setNeighborhood(createUserDTO.neighborhood());
+    user.setCnpj(createUserDTO.cnpj());
+    
+
+    user.setRoles(List.of(ModelRole.builder().name(Role.ROLE_USER).build()));
+    user.setProspecting(false);
+
+
+    if (createUserDTO.password() != null) {
+        user.setPassword(passwordEncoder.encode(createUserDTO.password()));
+    } else {
+        throw new IllegalArgumentException("SENHA OBRIGATÓRIA NA ATIVAÇÃO");
+    }
+
+
+    if (!isInformacoesCompletas(user)) {
+        throw new IllegalArgumentException("INFORMAÇÕES INCOMPLETAS PARA ATIVAÇÃO");
+    }
+
+    
+    userRepository.save(user);
+}
+
 
 
     public UUID salvarUsuario(CreateUserDTO createUserDTO){
