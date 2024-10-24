@@ -68,6 +68,17 @@ public class UserService {
 
         return newUser.getId();
     }
+    private boolean isInformacoesCompletas(ModelUser user) {
+
+    return user.getCpf() != null && !user.getCpf().isEmpty()
+            && user.getCep() != null && !user.getCep().isEmpty()
+            && user.getAddress() != null && !user.getAddress().isEmpty()
+            && user.getAddressNumber() != null && !user.getAddressNumber().isEmpty()
+            && user.getCity() != null && !user.getCity().isEmpty()
+            && user.getState() != null && !user.getState().isEmpty()
+            && user.getNeighborhood() != null && !user.getNeighborhood().isEmpty()
+            && user.getCnpj() != null && !user.getCnpj().isEmpty();
+}
 
    public void ativarUsuario(UUID id, CreateUserDTO createUserDTO) {
 
