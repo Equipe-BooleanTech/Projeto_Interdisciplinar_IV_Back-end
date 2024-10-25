@@ -58,7 +58,7 @@ public class SecurityConfig {
                                 "CHEF", "ADMIN"
                         )
                         .requestMatchers(
-                                "/api/user/roles/**"
+                                "/api/users/roles/**"
                         ).hasRole("ADMIN")
                         .anyRequest().denyAll()
                 )

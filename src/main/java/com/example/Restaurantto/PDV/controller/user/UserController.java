@@ -3,6 +3,9 @@ package com.example.Restaurantto.PDV.controller.user;
 import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
+import com.example.Restaurantto.PDV.enums.Role;
+import com.example.Restaurantto.PDV.model.user.ModelRole;
+import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
 import com.example.Restaurantto.PDV.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,8 +57,8 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Void> atualizarUsuario(@PathVariable UUID id, @RequestBody @Valid CreateUserDTO createUserDTO) {
-        userService.atualizarUsuario(id, createUserDTO);
+    public ResponseEntity<Void> atualizarUsuario(@PathVariable UUID id, @RequestBody @Valid UpdateUserDTO updateUserDTO) {
+        userService.atualizarUsuario(id, updateUserDTO);
         return ResponseEntity.ok().build();
     }
 
@@ -80,8 +85,27 @@ public class UserController {
 
 
     @PutMapping("/roles/{id}")
-    public ResponseEntity<Void> atualizarRoles(@PathVariable UUID id, @RequestBody @Valid UpdateRoleDTO updateRoleDTO) {
-        userService.atualizaRole(id, updateRoleDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> atualizarRole(@PathVariable UUID id, @Valid @RequestBody UpdateRoleDTO updateRoleDTO, Authentication authentication) {
+        try {
+            ModelUserDetailsImpl userDetails = (ModelUserDetailsImpl) authentication.getPrincipal();
+
+            if (userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado. Somente administradores podem alterar roles.");
+            }
+
+            userService.atualizaRole(id, updateRoleDTO);
+
+            return ResponseEntity.ok("Role do usuário atualizada com sucesso!");
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Role inválida: " + updateRoleDTO.roles());
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar role");
+        }
     }
+
+
 }
+

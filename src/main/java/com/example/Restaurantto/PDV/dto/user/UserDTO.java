@@ -1,6 +1,7 @@
 package com.example.Restaurantto.PDV.dto.user;
 
 import com.example.Restaurantto.PDV.enums.Role;
+import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.UUID;
 
 public record UserDTO(UUID id,
                       String email,
-                      List<Role> roles,
+                      Role roles,
                       String fullName,
                       String phone,
                       String cpf,

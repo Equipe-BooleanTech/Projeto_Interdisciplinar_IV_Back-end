@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record CreateUserDTO (
                              String email,
-                             Role role,
+                             String role,
                              String fullName,
                              String phone,
                              String cpf,
