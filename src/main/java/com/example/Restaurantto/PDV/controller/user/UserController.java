@@ -87,17 +87,12 @@ public class UserController {
     @PutMapping("/roles/{id}")
     public ResponseEntity<?> atualizarRole(@PathVariable UUID id, @Valid @RequestBody UpdateRoleDTO updateRoleDTO, Authentication authentication) {
         try {
-            // Verifica se o usuário autenticado é um administrador
             ModelUserDetailsImpl userDetails = (ModelUserDetailsImpl) authentication.getPrincipal();
 
-            // Cheque se o usuário autenticado tem permissão de ADMIN
             if (userDetails.getAuthorities().stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado. Somente administradores podem alterar roles.");
             }
 
-
-
-            // Atualiza o role do usuário identificado pelo ID
             userService.atualizaRole(id, updateRoleDTO);
 
             return ResponseEntity.ok("Role do usuário atualizada com sucesso!");

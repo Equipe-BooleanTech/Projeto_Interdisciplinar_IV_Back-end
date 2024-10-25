@@ -188,7 +188,6 @@ public class UserService {
         ModelUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        // Buscar ou criar um novo role
         ModelRole role = roleRepository.findByName(Role.valueOf(updateRoleDTO.roles()))
                 .orElseGet(() -> ModelRole.builder().name(Role.valueOf(updateRoleDTO.roles())).build());
 
