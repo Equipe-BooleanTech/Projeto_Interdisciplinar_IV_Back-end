@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
     public class AdminInitializer implements CommandLineRunner {
@@ -34,7 +35,7 @@ import java.util.List;
                 ModelUser admin = ModelUser.builder()
                         .email(adminEmail)
                         .password(passwordEncoder.encode(adminPassword))
-                        .roles(List.of(ModelRole.builder().name(Role.ROLE_ADMIN).build()))
+                        .role(ModelRole.builder().name(Role.ROLE_ADMIN).build())
                         .build();
 
                 userRepository.save(admin);

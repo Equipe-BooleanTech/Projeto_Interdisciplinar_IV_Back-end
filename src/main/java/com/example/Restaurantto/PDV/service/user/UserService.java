@@ -4,15 +4,19 @@ import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
+import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.exception.user.EmailAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.user.InvalidCredentialsException;
+import com.example.Restaurantto.PDV.model.product.Supplier;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
+import com.example.Restaurantto.PDV.repository.user.RoleRepository;
 import com.example.Restaurantto.PDV.repository.user.UserRepository;
 import com.example.Restaurantto.PDV.config.security.SecurityConfig;
 
 import com.example.Restaurantto.PDV.service.auth.JwtTokenService;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +28,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,6 +38,8 @@ import java.util.stream.Collectors;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RoleRepository roleRepository;
     @Autowired
     private SecurityConfig securityConfig;
     @Autowired
@@ -41,13 +49,15 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UUID salvarUsuarioProspeccao(ProspectingUserDTO prospectingUserDTO){
-        if(userRepository.findByEmail(prospectingUserDTO.email()).isPresent()){
+    public UUID salvarUsuarioProspeccao(ProspectingUserDTO prospectingUserDTO) {
+        if (userRepository.findByEmail(prospectingUserDTO.email()).isPresent()) {
             throw new EmailAlreadyRegisteredException("E-MAIL JÁ CADASTRADO");
         }
+
+
         ModelUser newUser = ModelUser.builder()
                 .email(prospectingUserDTO.email())
-                .roles(List.of(ModelRole.builder().name(Role.ROLE_INACTIVE).build()))
+                .role(ModelRole.builder().name(Role.ROLE_INACTIVE).build())
                 .fullName(prospectingUserDTO.fullName())
                 .phone(prospectingUserDTO.phone())
                 .enterprise(prospectingUserDTO.enterprise())
@@ -65,60 +75,58 @@ public class UserService {
                 .build();
 
         userRepository.save(newUser);
-
         return newUser.getId();
     }
+
+
     private boolean isInformacoesCompletas(ModelUser user) {
-
-    return user.getCpf() != null && !user.getCpf().isEmpty()
-            && user.getCep() != null && !user.getCep().isEmpty()
-            && user.getAddress() != null && !user.getAddress().isEmpty()
-            && user.getAddressNumber() < 0
-            && user.getCity() != null && !user.getCity().isEmpty()
-            && user.getState() != null && !user.getState().isEmpty()
-            && user.getNeighborhood() != null && !user.getNeighborhood().isEmpty()
-            && user.getCnpj() != null && !user.getCnpj().isEmpty();
-}
-
-   public void ativarUsuario(UUID id, CreateUserDTO createUserDTO) {
-
-    ModelUser user = userRepository.findById(id)
-            .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
-
-    
-    if (!user.isReadyForActivation()) {
-        throw new IllegalArgumentException("USUÁRIO NÃO ESTÁ APTO PARA ATIVAÇÃO");
+        return user.getCpf() != null && !user.getCpf().isEmpty()
+                && user.getCep() != null && !user.getCep().isEmpty()
+                && user.getAddress() != null && !user.getAddress().isEmpty()
+                && user.getAddressNumber() > 0
+                && user.getCity() != null && !user.getCity().isEmpty()
+                && user.getState() != null && !user.getState().isEmpty()
+                && user.getNeighborhood() != null && !user.getNeighborhood().isEmpty()
+                && user.getCnpj() != null && !user.getCnpj().isEmpty()
+                && user.getPassword() != null && !user.getPassword().isEmpty();
     }
 
+    public void ativarUsuario(UUID id, CreateUserDTO createUserDTO) {
+        ModelUser user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-    user.setCpf(createUserDTO.cpf());
-    user.setCep(createUserDTO.cep());
-    user.setAddress(createUserDTO.address());
-    user.setAddressNumber(createUserDTO.addressNumber());
-    user.setCity(createUserDTO.city());
-    user.setState(createUserDTO.state());
-    user.setNeighborhood(createUserDTO.neighborhood());
-    user.setCnpj(createUserDTO.cnpj());
-    
+        if (!user.isProspecting()) {
+            throw new IllegalStateException("O USUÁRIO JÁ ESTÁ ATIVADO");
+        }
 
-    user.setRoles(List.of(ModelRole.builder().name(Role.ROLE_USER).build()));
-    user.setProspecting(false);
+        user.setCpf(createUserDTO.cpf());
+        user.setCep(createUserDTO.cep());
+        user.setAddress(createUserDTO.address());
+        user.setAddressNumber(createUserDTO.addressNumber());
+        user.setCity(createUserDTO.city());
+        user.setState(createUserDTO.state());
+        user.setNeighborhood(createUserDTO.neighborhood());
+        user.setCnpj(createUserDTO.cnpj());
+        user.setPhone(createUserDTO.phone());
+        user.setFullName(createUserDTO.fullName());
+        user.setEnterprise(createUserDTO.enterprise());
+        user.setEmployee(createUserDTO.isEmployee());
+        user.setRole(ModelRole.builder().name(Role.ROLE_USER).build());
 
+        user.setProspecting(false);
 
-    if (createUserDTO.password() != null) {
-        user.setPassword(passwordEncoder.encode(createUserDTO.password()));
-    } else {
-        throw new IllegalArgumentException("SENHA OBRIGATÓRIA NA ATIVAÇÃO");
+        if (createUserDTO.password() != null) {
+            user.setPassword(passwordEncoder.encode(createUserDTO.password()));
+        } else {
+            throw new IllegalArgumentException("SENHA OBRIGATÓRIA NA ATIVAÇÃO");
+        }
+
+        if (!isInformacoesCompletas(user)) {
+            throw new IllegalArgumentException("INFORMAÇÕES INCOMPLETAS PARA ATIVAÇÃO");
+        }
+
+        userRepository.save(user);
     }
-
-
-    if (!isInformacoesCompletas(user)) {
-        throw new IllegalArgumentException("INFORMAÇÕES INCOMPLETAS PARA ATIVAÇÃO");
-    }
-
-    
-    userRepository.save(user);
-}
 
 
 
@@ -126,10 +134,11 @@ public class UserService {
         if(userRepository.findByEmail(createUserDTO.email()).isPresent()){
             throw new EmailAlreadyRegisteredException("E-MAIL JÁ CADASTRADO");
         }
+
         ModelUser newUser = ModelUser.builder()
                 .email(createUserDTO.email())
                 .password(securityConfig.passwordEncoder().encode(createUserDTO.password()))
-                .roles(List.of(ModelRole.builder().name(createUserDTO.role()).build()))
+                .role(ModelRole.builder().name(Role.valueOf(createUserDTO.role())).build())
                 .fullName(createUserDTO.fullName())
                 .phone(createUserDTO.phone())
                 .cpf(createUserDTO.cpf())
@@ -151,21 +160,26 @@ public class UserService {
         return newUser.getId();
     }
 
-    public void atualizarUsuario(UUID id, CreateUserDTO createUserDTO){
+    public void atualizarUsuario(UUID id, UpdateUserDTO updateUserDTO){
         ModelUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        user.setFullName(createUserDTO.fullName());
-        user.setPhone(createUserDTO.phone());
-        user.setCpf(createUserDTO.cpf());
-        user.setCep(createUserDTO.cep());
-        user.setAddress(createUserDTO.address());
-        user.setCity(createUserDTO.city());
-        user.setState(createUserDTO.state());
-        user.setNeighborhood(createUserDTO.neighborhood());
-        user.setFunction(createUserDTO.function());
-        user.setCnpj(createUserDTO.cnpj());
-        user.setEmployee(createUserDTO.isEmployee());
+        user.setEmail(updateUserDTO.email());
+        user.setFullName(updateUserDTO.fullName());
+        user.setPhone(updateUserDTO.phone());
+        user.setCpf(updateUserDTO.cpf());
+        user.setCep(updateUserDTO.cep());
+        user.setAddress(updateUserDTO.address());
+        user.setAddressNumber(updateUserDTO.addressNumber());
+        user.setCity(updateUserDTO.city());
+        user.setState(updateUserDTO.state());
+        user.setNeighborhood(updateUserDTO.neighborhood());
+        user.setCnpj(updateUserDTO.cnpj());
+        user.setMessage(updateUserDTO.message());
+        user.setEnterprise(updateUserDTO.enterprise());
+        user.setProspecting(updateUserDTO.isProspecting());
+        user.setEmployee(updateUserDTO.isEmployee());
+        user.setFunction(updateUserDTO.function());
 
         userRepository.save(user);
     }
@@ -174,14 +188,16 @@ public class UserService {
         ModelUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("USUÁRIO NÃO ENCONTRADO"));
 
-        List<ModelRole> rolesAtualizadas = updateRoleDTO.roles().stream()
-                .map(role -> ModelRole.builder().name(Role.valueOf(role)).build())
-                .collect(Collectors.toList());
+        // Buscar ou criar um novo role
+        ModelRole role = roleRepository.findByName(Role.valueOf(updateRoleDTO.roles()))
+                .orElseGet(() -> ModelRole.builder().name(Role.valueOf(updateRoleDTO.roles())).build());
 
-        user.setRoles(rolesAtualizadas);
+        user.setRole(role);
 
         userRepository.save(user);
     }
+
+
 
     public void deletarUsuario(UUID id){
         if(!userRepository.existsById(id)){
@@ -231,9 +247,7 @@ public class UserService {
         return new UserDTO(
                 user.getId(),
                 user.getEmail(),
-                user.getRoles().stream()
-                        .map(ModelRole::getName)
-                        .collect(Collectors.toList()),
+                user.getRole().getName(),
                 user.getFullName(),
                 user.getPhone(),
                 user.getCpf(),

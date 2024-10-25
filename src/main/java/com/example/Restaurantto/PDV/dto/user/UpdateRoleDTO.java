@@ -1,6 +1,8 @@
 package com.example.Restaurantto.PDV.dto.user;
 
-import java.util.List;
+import com.example.Restaurantto.PDV.enums.Role;
 
-public record UpdateRoleDTO(List<String> roles) {
+
+
+public record UpdateRoleDTO(String roles) {
 }
