@@ -1,5 +1,6 @@
 package com.example.Restaurantto.PDV.config.security;
 
+import com.example.Restaurantto.PDV.config.cors.CorsConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     @Autowired
     private UserAuthenticationFilter userAuthenticationFilter;
+
+    @Autowired
+    private CorsConfig corsConfig;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -61,7 +65,7 @@ public class SecurityConfig {
                                 "/api/users/roles/**"
                         ).hasRole("ADMIN")
                         .anyRequest().denyAll()
-                )
+                ).cors(c -> c.configurationSource(corsConfig))
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

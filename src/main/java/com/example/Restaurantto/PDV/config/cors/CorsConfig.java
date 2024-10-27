@@ -1,28 +1,20 @@
 package com.example.Restaurantto.PDV.config.cors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
-@Configuration
-@EnableWebMvc
-public class CorsConfig implements WebMvcConfigurer {
+import java.util.List;
 
-    private static final Logger logger = LoggerFactory.getLogger(CorsConfig.class);
-
+@Component
+public class CorsConfig implements CorsConfigurationSource {
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        logger.info("Configurando CORS: origem permitida: http://localhost:4200");
-
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200") //endereço do front-end
-                .allowedMethods("GET", "POST", "PUT", "DELETE","OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-
-        logger.info("CORS configurado com sucesso!");
+    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://127.0.0.1:4200"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("*"));
+        return config;
     }
 }
