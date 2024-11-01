@@ -4,8 +4,13 @@ import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
+import com.example.Restaurantto.PDV.exception.user.UserCreationFailedException;
+import com.example.Restaurantto.PDV.exception.user.UserDeletionFailedException;
+import com.example.Restaurantto.PDV.exception.user.UserUpdateFailedException;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
+import com.example.Restaurantto.PDV.response.SuccessResponse;
+import com.example.Restaurantto.PDV.response.UpdateResponse;
 import com.example.Restaurantto.PDV.service.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,36 +42,62 @@ public class UserController {
 
 
     @PostMapping("/create-complete")
-    public ResponseEntity<UUID> salvarUsuario(@RequestBody @Valid CreateUserDTO createUserDTO) {
-        UUID id = userService.salvarUsuario(createUserDTO);
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
+    public ResponseEntity<SuccessResponse> salvarUsuario(@RequestBody @Valid CreateUserDTO createUserDTO) {
+        try {
+            UUID id = userService.salvarUsuario(createUserDTO);
+            SuccessResponse response = new SuccessResponse("USUÁRIO CRIADO COM SUCESSO!", id);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (UserCreationFailedException e) {
+            throw e;
+        }
+
     }
 
 
     @PostMapping("/prospects")
-    public ResponseEntity<UUID> salvarUsuarioProspeccao(@RequestBody @Valid ProspectingUserDTO prospectingUserDTO) {
-        UUID id = userService.salvarUsuarioProspeccao(prospectingUserDTO);
-        return new ResponseEntity<>(id, HttpStatus.CREATED);
+    public ResponseEntity<SuccessResponse> salvarUsuarioProspeccao(@RequestBody @Valid ProspectingUserDTO prospectingUserDTO) {
+        try {
+            UUID id = userService.salvarUsuarioProspeccao(prospectingUserDTO);
+            SuccessResponse response = new SuccessResponse("POSPECÇÃO CRIADA COM SUCESSO!", id);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }catch (UserCreationFailedException e){
+            throw e;
+        }
     }
 
 
     @PutMapping("/activate/{id}")
-    public ResponseEntity<Void> ativarUsuario(@PathVariable UUID id, @RequestBody @Valid CreateUserDTO createUserDTO) {
-        userService.ativarUsuario(id, createUserDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<SuccessResponse> ativarUsuario(@PathVariable UUID id, @RequestBody @Valid CreateUserDTO createUserDTO) {
+        try {
+            userService.ativarUsuario(id, createUserDTO);
+            SuccessResponse response = new SuccessResponse("POSPECÇÃO ATIVADA COM SUCESSO!", id);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }catch (UserCreationFailedException e){
+            throw e;
+        }
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Void> atualizarUsuario(@PathVariable UUID id, @RequestBody @Valid UpdateUserDTO updateUserDTO) {
-        userService.atualizarUsuario(id, updateUserDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UpdateResponse> atualizarUsuario(@PathVariable UUID id, @RequestBody @Valid UpdateUserDTO updateUserDTO) {
+        try {
+            userService.atualizarUsuario(id, updateUserDTO);
+            UpdateResponse response = new UpdateResponse("USUÁRIO ATUALIZADO COM SUCESSO!");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch (UserUpdateFailedException e){
+            throw  e;
+        }
     }
 
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> removerUsuario(@PathVariable UUID id) {
-        userService.deletarUsuario(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<SuccessResponse> removerUsuario(@PathVariable UUID id) {
+        try {
+            userService.deletarUsuario(id);
+            SuccessResponse response = new SuccessResponse("USUÁRIO DELETADO COM SUCESSO!", id);
+            return ResponseEntity.noContent().build();
+        }catch (UserDeletionFailedException e){
+            throw e;
+        }
     }
 
 
