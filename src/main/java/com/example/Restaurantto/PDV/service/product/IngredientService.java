@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -88,4 +89,9 @@ public class IngredientService {
         return ingredientRepository.findAll(pageRequest)
                 .map(this::listarIngrediente);
     }
+
+    public Optional<Ingredient> listarIngredientePeloId(UUID id) {
+        return ingredientRepository.findById(id);
+    }
+
 }
