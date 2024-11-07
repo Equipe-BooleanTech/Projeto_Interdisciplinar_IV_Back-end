@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/api/users/update-password").authenticated()
                         .requestMatchers(
                                 "/api/users/get-users",
+                                "/api/users/get-users-by-id/{id}",
                                 "/api/users/create-complete",
                                 "/api/products/create-supplier",
                                 "/api/products/create-ingredient",
