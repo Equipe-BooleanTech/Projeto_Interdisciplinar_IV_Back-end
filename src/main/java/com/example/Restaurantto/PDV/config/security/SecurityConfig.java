@@ -50,6 +50,8 @@ public class SecurityConfig {
                                 "/api/products/delete-supplier/{id}",
                                 "/api/products/delete-ingredient/{id}",
                                 "/api/products/get-supplier",
+                                "/api/products/get-supplier-by-id/{id}",
+                                "/api/products/get-ingredient-by-id/{id}",
                                 "/api/products/get-ingredients"
                         ).hasAnyRole(
                                 "GERENTE", "ADMIN"
@@ -58,7 +60,8 @@ public class SecurityConfig {
                                 "/api/datasheets/create-datasheet",
                                 "/api/datasheets/update-datasheet/{id}",
                                 "/api/datasheets/delete-datasheet/{id}",
-                                "/api/datasheets/get-datasheets"
+                                "/api/datasheets/get-datasheets",
+                                "/api/datasheets/get-datasheet-by-id/{id}"
                         ).hasAnyRole(
                                 "CHEF", "ADMIN"
                         )

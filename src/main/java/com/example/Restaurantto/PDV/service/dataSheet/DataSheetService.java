@@ -6,18 +6,17 @@ import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
-import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
 import com.example.Restaurantto.PDV.model.product.Ingredient;
 import com.example.Restaurantto.PDV.repository.dataSheet.DataSheetRepository;
 import com.example.Restaurantto.PDV.repository.product.IngredientRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -112,6 +111,10 @@ public class DataSheetService {
                 ingredient.getDescription(),
                 ingredient.getIsAnimalOrigin(),
                 ingredient.getSif());
+    }
+
+    public Optional<DataSheet> listarFichaPeloId(UUID id) {
+        return dataSheetRepository.findById(id);
     }
     }
 

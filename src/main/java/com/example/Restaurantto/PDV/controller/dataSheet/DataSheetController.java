@@ -2,6 +2,9 @@ package com.example.Restaurantto.PDV.controller.dataSheet;
 
 import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
 import com.example.Restaurantto.PDV.dto.dataSheet.GetDataSheetDTO;
+import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
+import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
+import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
 import com.example.Restaurantto.PDV.service.dataSheet.DataSheetService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -48,6 +52,21 @@ public class DataSheetController {
     public ResponseEntity<Page<GetDataSheetDTO>> listarTodosDataSheets(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<GetDataSheetDTO> dataSheets = dataSheetService.listarTodosDataSheets(PageRequest.of(page, size));
         return ResponseEntity.ok(dataSheets);
+    }
+
+    @GetMapping("/get-datasheet-by-id/{id}")
+    public ResponseEntity<?> buscarFichaPorId(@PathVariable UUID id) {
+        try {
+            Optional<DataSheet> dataSheet = dataSheetService.listarFichaPeloId(id);
+            if (dataSheet.isPresent()){
+                return ResponseEntity.ok(dataSheet);
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("FICHA NÃO ENCONTRADA \n ID INVÁLIDO");
+            }
+
+        }catch (DataSheetNotFoundException e){
+            throw e;
+        }
     }
 
 }
