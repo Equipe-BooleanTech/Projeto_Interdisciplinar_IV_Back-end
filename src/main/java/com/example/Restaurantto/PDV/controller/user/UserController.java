@@ -6,6 +6,7 @@ import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.exception.user.UserCreationFailedException;
 import com.example.Restaurantto.PDV.exception.user.UserDeletionFailedException;
+import com.example.Restaurantto.PDV.exception.user.UserNotFoundException;
 import com.example.Restaurantto.PDV.exception.user.UserUpdateFailedException;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
@@ -116,9 +117,18 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
     @GetMapping("/get-users-by-id/{id}")
-    public ResponseEntity<Optional<ModelUser>> buscarPorId(@PathVariable UUID id) {
+    public ResponseEntity<?> buscarPorId(@PathVariable UUID id) {
+        try{
         Optional<ModelUser> user = userService.listarPeloId(id);
-        return ResponseEntity.ok(user);
+
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("USUÁRIO NÃO ENCONTRADO");
+        }}catch (UserNotFoundException e){
+            throw e;
+        }
     }
 
 

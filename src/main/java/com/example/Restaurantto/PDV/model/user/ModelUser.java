@@ -29,7 +29,6 @@ public class ModelUser {
     private ModelRole role;
     private String fullName;
     private String phone;
-    @Column(unique = true, nullable = true)
     private String cpf;
     private String cep;
     private String address;
