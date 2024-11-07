@@ -4,10 +4,8 @@ import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
-import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.exception.user.EmailAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.user.InvalidCredentialsException;
-import com.example.Restaurantto.PDV.model.product.Supplier;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
@@ -16,7 +14,6 @@ import com.example.Restaurantto.PDV.repository.user.UserRepository;
 import com.example.Restaurantto.PDV.config.security.SecurityConfig;
 
 import com.example.Restaurantto.PDV.service.auth.JwtTokenService;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,11 +25,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -269,6 +262,10 @@ public class UserService {
     public Page<UserDTO> listarTodosUsuarios(PageRequest pageRequest) {
         return userRepository.findAll(pageRequest)
                 .map(this::mapToUserDTO);
+    }
+
+    public Optional<ModelUser> listarPeloId(UUID id) {
+        return userRepository.findById(id);
     }
 
 }

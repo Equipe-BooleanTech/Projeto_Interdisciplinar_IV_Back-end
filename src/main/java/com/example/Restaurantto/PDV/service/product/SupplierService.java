@@ -6,6 +6,7 @@ import com.example.Restaurantto.PDV.dto.user.UserDTO;
 import com.example.Restaurantto.PDV.exception.product.SupplierAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.model.product.Supplier;
+import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.repository.product.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -68,6 +70,10 @@ public class SupplierService {
         return supplierRepository.findAll(pageRequest)
                 .map(this::listarFornecedor);
 
+    }
+
+    public Optional<Supplier> listarFornecedorPeloId(UUID id) {
+        return supplierRepository.findById(id);
     }
 
 }

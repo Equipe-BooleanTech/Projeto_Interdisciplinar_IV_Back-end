@@ -6,8 +6,10 @@ import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.exception.user.UserCreationFailedException;
 import com.example.Restaurantto.PDV.exception.user.UserDeletionFailedException;
+import com.example.Restaurantto.PDV.exception.user.UserNotFoundException;
 import com.example.Restaurantto.PDV.exception.user.UserUpdateFailedException;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
+import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
 import com.example.Restaurantto.PDV.response.SuccessResponse;
 import com.example.Restaurantto.PDV.response.UpdateResponse;
@@ -24,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -112,6 +115,20 @@ public class UserController {
     public ResponseEntity<Page<UserDTO>> listarTodosUsuarios(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<UserDTO> users = (Page<UserDTO>) userService.listarTodosUsuarios(PageRequest.of(page, size));
         return ResponseEntity.ok(users);
+    }
+    @GetMapping("/get-users-by-id/{id}")
+    public ResponseEntity<?> buscarPorId(@PathVariable UUID id) {
+        try{
+        Optional<ModelUser> user = userService.listarPeloId(id);
+
+        if (user.isPresent()) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("USUÁRIO NÃO ENCONTRADO");
+        }}catch (UserNotFoundException e){
+            throw e;
+        }
     }
 
 

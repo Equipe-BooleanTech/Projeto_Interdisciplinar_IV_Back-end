@@ -4,6 +4,8 @@ import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
 import com.example.Restaurantto.PDV.exception.product.*;
+import com.example.Restaurantto.PDV.model.product.Ingredient;
+import com.example.Restaurantto.PDV.model.product.Supplier;
 import com.example.Restaurantto.PDV.response.SuccessResponse;
 import com.example.Restaurantto.PDV.response.UpdateResponse;
 import com.example.Restaurantto.PDV.service.product.IngredientService;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -105,6 +108,35 @@ public class ProductController {
     public ResponseEntity<Page<IngredientDTO>> listarTodosIngredientes(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
         Page<IngredientDTO> ingredients = ingredientService.listarTodosIngredientes(PageRequest.of(page,size));
         return ResponseEntity.ok(ingredients);
+    }
+
+    @GetMapping("/get-supplier-by-id/{id}")
+    public ResponseEntity<?> buscarFonecedorPorId(@PathVariable UUID id) {
+        try {
+            Optional<Supplier> supplier = supplierService.listarFornecedorPeloId(id);
+            if (supplier.isPresent()){
+                return ResponseEntity.ok(supplier);
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("FORNECEDOR NÃO ENCONTRADO \n ID INVÁLIDO");
+            }
+
+        }catch (SupplierNotFoundException e){
+            throw e;
+        }
+    }
+
+    @GetMapping("/get-ingredient-by-id/{id}")
+    public ResponseEntity<?> buscarIngredientePorId(@PathVariable UUID id) {
+        try {
+            Optional<Ingredient> ingredient = ingredientService.listarIngredientePeloId(id);
+            if (ingredient.isPresent()){
+                return ResponseEntity.ok(ingredient);
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("INGREDIENTE NÃO ENCONTRADO \n ID INVÁLIDO");
+            }
+        }catch (IngredientNotFoundException e){
+            throw e;
+        }
     }
 
 }
