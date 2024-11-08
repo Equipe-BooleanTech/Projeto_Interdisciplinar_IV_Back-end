@@ -52,7 +52,12 @@ public class SecurityConfig {
                                 "/api/products/get-supplier",
                                 "/api/products/get-supplier-by-id/{id}",
                                 "/api/products/get-ingredient-by-id/{id}",
-                                "/api/products/get-ingredients"
+                                "/api/products/get-ingredients",
+                                "/api/financials/expenses",
+                                "/api/financials/revenues",
+                                "/api/financials/total-expenses",
+                                "/api/financials/total-revenue",
+                                "/api/financials/cash-flow"
                         ).hasAnyRole(
                                 "GERENTE", "ADMIN"
                         )
