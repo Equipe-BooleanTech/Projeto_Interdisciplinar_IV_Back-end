@@ -53,12 +53,20 @@ public class SecurityConfig {
                                 "/api/products/get-supplier-by-id/{id}",
                                 "/api/products/get-ingredient-by-id/{id}",
                                 "/api/products/get-ingredients",
-                                "/api/financials/expenses",
-                                "/api/financials/revenues",
+                                "/api/financials/get-all-expenses",
+                                "/api/financials/get-all-revenues",
                                 "/api/financials/total-expenses",
                                 "/api/financials/total-revenue",
-                                "/api/financials/cash-flow"
-                        ).hasAnyRole(
+                                "/api/financials/cash-flow",
+                                "/api/financials/create-expense",
+                                "/api/financials/create-revenue",
+                                "/api/financials/update-expense/{id}",
+                                "/api/financials/update-revenue/{id}",
+                                "/api/financials/delete-expense/{id}",
+                                "/api/financials/delete-revenue/{id}",
+                                "/api/financials/get-expense-by-id/{id}",
+                                "/api/financials/get-revenue-by-id/{id}"
+                                ).hasAnyRole(
                                 "GERENTE", "ADMIN"
                         )
                         .requestMatchers(
