@@ -1,6 +1,7 @@
 package com.example.Restaurantto.PDV.response;
 
 import com.example.Restaurantto.PDV.exception.financial.NoFinancialRecordsException;
+import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
 import com.example.Restaurantto.PDV.exception.product.*;
 import com.example.Restaurantto.PDV.exception.user.*;
 import org.springframework.http.HttpStatus;
@@ -167,6 +168,17 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleRecordNotFoundException(RecordNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+
 
 
 

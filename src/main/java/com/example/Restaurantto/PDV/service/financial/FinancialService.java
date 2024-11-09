@@ -5,6 +5,7 @@ import com.example.Restaurantto.PDV.dto.financial.ExpensesDTO;
 import com.example.Restaurantto.PDV.dto.financial.RevenueDTO;
 import com.example.Restaurantto.PDV.dto.financial.FinancialSummaryDTO;
 import com.example.Restaurantto.PDV.exception.financial.NoFinancialRecordsException;
+import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
 import com.example.Restaurantto.PDV.model.financial.Expenses;
 import com.example.Restaurantto.PDV.model.financial.Revenue;
 import com.example.Restaurantto.PDV.repository.financial.ExpensesRepository;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class FinancialService {
@@ -26,8 +29,66 @@ public class FinancialService {
     private RevenueRepository revenueRepository;
 
 
+    public UUID criarDespesa(ExpensesDTO expensesDTO) {
+        Expenses expense = new Expenses();
+        expense.setDescription(expensesDTO.description());
+        expense.setCategory(expensesDTO.category());
+        expense.setAmount(expensesDTO.amount());
+        expense.setPaymentDate(expensesDTO.paymentDate());
+
+        expensesRepository.save(expense);
+        return expense.getId();
+    }
+
+    public void atualizarDespesa(UUID id, ExpensesDTO expensesDTO){
+        Expenses expense = expensesRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Despesa não encontrada"));
+
+        expense.setDescription(expensesDTO.description());
+        expense.setCategory(expensesDTO.category());
+        expense.setAmount(expensesDTO.amount());
+        expense.setPaymentDate(expensesDTO.paymentDate());
+
+        expensesRepository.save(expense);
+    }
+
+    public void deletarDespesa(UUID id){
+        if (!expensesRepository.existsById(id)) {
+            throw new RecordNotFoundException("Despesa não encontrada");
+        }
+        expensesRepository.deleteById(id);
+    }
+
+    // CRUD para Revenue
+
+    public UUID criarReceita(RevenueDTO revenueDTO) {
+        Revenue revenue = new Revenue();
+        revenue.setAmount(revenueDTO.amount());
+        revenue.setSaleDate(revenueDTO.saleDate());
+
+        revenueRepository.save(revenue);
+        return revenue.getId();
+    }
+
+    public void atualizarReceita(UUID id, RevenueDTO revenueDTO){
+        Revenue revenue = revenueRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Receita não encontrada"));
+
+        revenue.setAmount(revenueDTO.amount());
+        revenue.setSaleDate(revenueDTO.saleDate());
+
+        revenueRepository.save(revenue);
+    }
+
+    public void deletarReceita(UUID id){
+        if (!revenueRepository.existsById(id)) {
+            throw new RecordNotFoundException("Receita não encontrada");
+        }
+        revenueRepository.deleteById(id);
+    }
+
     public BigDecimal calcularTotalDespesas(DateRangeDTO dateRange) {
-        List<Expenses> despesas = expensesRepository.findPaymentDateBetween(dateRange.startDate(), dateRange.endDate());
+        List<Expenses> despesas = expensesRepository.findByPaymentDateBetween(dateRange.startDate(), dateRange.endDate());
         if (despesas.isEmpty()) {
             throw new NoFinancialRecordsException("Nenhuma despesa encontrada no período especificado.");
         }
@@ -37,7 +98,7 @@ public class FinancialService {
     }
 
     public BigDecimal calcularTotalReceitas(DateRangeDTO dateRange) {
-        List<Revenue> receitas = revenueRepository.findSaleDateBetween(dateRange.startDate(), dateRange.endDate());
+        List<Revenue> receitas = revenueRepository.findBySaleDateBetween(dateRange.startDate(), dateRange.endDate());
         if (receitas.isEmpty()) {
             throw new NoFinancialRecordsException("Nenhuma receita encontrada no período especificado.");
         }
@@ -62,6 +123,12 @@ public class FinancialService {
     public Page<RevenueDTO> listarTodasReceitas(PageRequest pageRequest) {
         return revenueRepository.findAll(pageRequest)
                 .map(this::mapToRevenueDTO);
+    }
+    public Optional<Expenses> listarDespesaPeloId(UUID id) {
+        return expensesRepository.findById(id);
+    }
+    public Optional<Revenue> listarReceitaPeloId(UUID id) {
+        return revenueRepository.findById(id);
     }
 
     private ExpensesDTO mapToExpensesDTO(Expenses expense) {

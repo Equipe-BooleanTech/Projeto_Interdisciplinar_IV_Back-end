@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface RevenueRepository extends JpaRepository<Revenue, UUID> {
-    List<Revenue> findSaleDateBetween(LocalDate start, LocalDate end);
+    List<Revenue> findBySaleDateBetween(LocalDate start, LocalDate end);
 }
