@@ -2,7 +2,10 @@ package com.example.Restaurantto.PDV.service.dataSheet;
 
 import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
 import com.example.Restaurantto.PDV.dto.dataSheet.GetDataSheetDTO;
+import com.example.Restaurantto.PDV.dto.dataSheet.TimeDataSheetSummaryDTO;
+import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
+import com.example.Restaurantto.PDV.dto.product.TimeIngredientSummaryDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
@@ -15,10 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +48,7 @@ public class DataSheetService {
         DataSheet dataSheet = DataSheet.builder()
                 .name(dataSheetDTO.name())
                 .ingredients(ingredients)
+                .createdAt(LocalDate.now())
                 .build();
 
         dataSheetRepository.save(dataSheet);
@@ -98,7 +102,8 @@ public class DataSheetService {
         return new GetDataSheetDTO(
                 dataSheet.getId(),
                 dataSheet.getName(),
-                ingredients
+                ingredients,
+                dataSheet.getCreatedAt()
         );
     }
 
@@ -110,11 +115,42 @@ public class DataSheetService {
                 ingredient.getQuantity(),
                 ingredient.getDescription(),
                 ingredient.getIsAnimalOrigin(),
-                ingredient.getSif());
+                ingredient.getSif(),
+                ingredient.getCreatedAt());
     }
 
     public Optional<DataSheet> listarFichaPeloId(UUID id) {
         return dataSheetRepository.findById(id);
+    }
+
+    public Map<String, TimeDataSheetSummaryDTO> listarFichasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
+        List<DataSheet> dataSheets = dataSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+
+        return dataSheets.stream()
+                .map(this::mapearParaGetDataSheetDTO)
+                .collect(Collectors.groupingBy(
+                        dataSheet -> {
+                            switch (groupingType.toLowerCase()) {
+                                case "weekly":
+                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                                    int weekNumber = dataSheet.createdAt().get(weekFields.weekOfWeekBasedYear());
+                                    int weekYear = dataSheet.createdAt().getYear();
+                                    return STR."Week \{weekNumber}, \{weekYear}";
+                                case "yearly":
+                                    int year = dataSheet.createdAt().getYear();
+                                    return STR."Year \{year}";
+                                default:
+                                    return STR."\{dataSheet.createdAt()
+                                            .getMonth().
+                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                            }\{dataSheet.createdAt().getYear()}";
+                            }
+                        },
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                dataSheetList -> new TimeDataSheetSummaryDTO(dataSheetList, dataSheetList.size())
+                        )
+                ));
     }
     }
 

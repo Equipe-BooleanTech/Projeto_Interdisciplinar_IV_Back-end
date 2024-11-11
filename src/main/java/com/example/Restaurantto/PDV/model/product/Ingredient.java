@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 @AllArgsConstructor
@@ -33,6 +35,9 @@ public class Ingredient {
     private String description;
     private Boolean isAnimalOrigin;
     private String sif;
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDate createdAt;
 
 
 }

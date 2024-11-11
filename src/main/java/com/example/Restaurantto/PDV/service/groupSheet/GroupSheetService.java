@@ -1,8 +1,11 @@
 package com.example.Restaurantto.PDV.service.groupSheet;
 
 import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
+import com.example.Restaurantto.PDV.dto.dataSheet.TimeDataSheetSummaryDTO;
+import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GetGroupSheetDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GroupSheetDTO;
+import com.example.Restaurantto.PDV.dto.groupSheet.TimeGroupSheetSummaryDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.exception.groupSheet.GroupSheetAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.groupSheet.GroupSheetNotFoundException;
@@ -16,9 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +49,7 @@ public class GroupSheetService {
         GroupSheet groupSheet = GroupSheet.builder()
                 .name(groupSheetDTO.name())
                 .datasheets(dataSheets)
+                .createdAt(LocalDate.now())
                 .build();
 
         groupSheetRepository.save(groupSheet);
@@ -97,7 +102,7 @@ public class GroupSheetService {
                 .map(this::mapearParaDataSheetDTO)
                 .collect(Collectors.toList());
 
-        return new GetGroupSheetDTO(groupSheet.getId(), groupSheet.getName(), datasheets);
+        return new GetGroupSheetDTO(groupSheet.getId(), groupSheet.getName(), datasheets,groupSheet.getCreatedAt());
     }
 
     private DataSheetDTO mapearParaDataSheetDTO(DataSheet dataSheet) {
@@ -125,7 +130,38 @@ public class GroupSheetService {
                 ingredient.getQuantity(),
                 ingredient.getDescription(),
                 ingredient.getIsAnimalOrigin(),
-                ingredient.getSif()
+                ingredient.getSif(),
+                ingredient.getCreatedAt()
         );
+    }
+
+    public Map<String, TimeGroupSheetSummaryDTO> listarGrupoDeFichasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
+        List<GroupSheet> groupSheets = groupSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+
+        return groupSheets.stream()
+                .map(this::mapearParaGetGroupSheetDTO)
+                .collect(Collectors.groupingBy(
+                        groupSheet -> {
+                            switch (groupingType.toLowerCase()) {
+                                case "weekly":
+                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                                    int weekNumber = groupSheet.createdAt().get(weekFields.weekOfWeekBasedYear());
+                                    int weekYear = groupSheet.createdAt().getYear();
+                                    return STR."Week \{weekNumber}, \{weekYear}";
+                                case "yearly":
+                                    int year = groupSheet.createdAt().getYear();
+                                    return STR."Year \{year}";
+                                default:
+                                    return STR."\{groupSheet.createdAt()
+                                            .getMonth().
+                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                            }\{groupSheet.createdAt().getYear()}";
+                            }
+                        },
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                groupSheetList -> new TimeGroupSheetSummaryDTO(groupSheetList, groupSheetList.size())
+                        )
+                ));
     }
 }

@@ -3,6 +3,7 @@ package com.example.Restaurantto.PDV.dto.product;
 import com.example.Restaurantto.PDV.model.product.Supplier;
 
 
+import java.time.LocalDate;
 import java.util.Set;
 
 public record IngredientDTO(String name,
@@ -12,6 +13,7 @@ public record IngredientDTO(String name,
                             Double quantity,
                             String description,
                             Boolean isAnimalOrigin,
-                            String sif
+                            String sif,
+                            LocalDate createdAt
                          ) {
 }
