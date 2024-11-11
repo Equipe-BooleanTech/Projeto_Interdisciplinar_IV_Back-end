@@ -2,6 +2,9 @@ package com.example.Restaurantto.PDV.controller.dataSheet;
 
 import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
 import com.example.Restaurantto.PDV.dto.dataSheet.GetDataSheetDTO;
+import com.example.Restaurantto.PDV.dto.dataSheet.TimeDataSheetSummaryDTO;
+import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
 import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,4 +73,20 @@ public class DataSheetController {
         }
     }
 
+    @PostMapping("/list-datasheets-by-period")
+    public ResponseEntity<?> listarFichasPorPeriodo(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType) {
+        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
+        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=weekly ELE LISTA POR SEMANA
+        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=yearly ELE LISTA POR ANO
+        Map<String, TimeDataSheetSummaryDTO> fichasPorPeriodo = dataSheetService.listarFichasPorPeriodo(dateRangeDTO, groupingType);
+
+        if (fichasPorPeriodo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("NENHUMA FICHA ENCONTRADA NO PERÍODO ESPECIFICADO");
+        } else {
+            return ResponseEntity.ok(fichasPorPeriodo);
+        }
+    }
 }
