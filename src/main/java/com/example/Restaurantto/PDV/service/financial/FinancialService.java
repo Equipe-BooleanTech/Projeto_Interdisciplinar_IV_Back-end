@@ -1,9 +1,6 @@
 package com.example.Restaurantto.PDV.service.financial;
 
-import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
-import com.example.Restaurantto.PDV.dto.financial.ExpensesDTO;
-import com.example.Restaurantto.PDV.dto.financial.RevenueDTO;
-import com.example.Restaurantto.PDV.dto.financial.FinancialSummaryDTO;
+import com.example.Restaurantto.PDV.dto.financial.*;
 import com.example.Restaurantto.PDV.exception.financial.NoFinancialRecordsException;
 import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
 import com.example.Restaurantto.PDV.model.financial.Expenses;
@@ -16,9 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.format.TextStyle;
+import java.time.temporal.WeekFields;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FinancialService {
@@ -117,12 +115,12 @@ public class FinancialService {
 
     public Page<ExpensesDTO> listarTodasDespesas(PageRequest pageRequest) {
         return expensesRepository.findAll(pageRequest)
-                .map(this::mapToExpensesDTO);
+                .map(this::listarDespesas);
     }
 
     public Page<RevenueDTO> listarTodasReceitas(PageRequest pageRequest) {
         return revenueRepository.findAll(pageRequest)
-                .map(this::mapToRevenueDTO);
+                .map(this::listarReceitas);
     }
     public Optional<Expenses> listarDespesaPeloId(UUID id) {
         return expensesRepository.findById(id);
@@ -131,7 +129,7 @@ public class FinancialService {
         return revenueRepository.findById(id);
     }
 
-    private ExpensesDTO mapToExpensesDTO(Expenses expense) {
+    private ExpensesDTO listarDespesas(Expenses expense) {
         return new ExpensesDTO(
                 expense.getId(),
                 expense.getDescription(),
@@ -141,11 +139,71 @@ public class FinancialService {
         );
     }
 
-    private RevenueDTO mapToRevenueDTO(Revenue revenue) {
+    private RevenueDTO listarReceitas(Revenue revenue) {
         return new RevenueDTO(
                 revenue.getId(),
                 revenue.getAmount(),
                 revenue.getSaleDate()
         );
+    }
+
+    public Map<String, TimeRevenueSummaryDTO> listarReceitasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
+        List<Revenue> revenues = revenueRepository.findAllBysaleDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+
+        return revenues.stream()
+                .map(this::listarReceitas)
+                .collect(Collectors.groupingBy(
+                        revenue -> {
+                            switch (groupingType.toLowerCase()) {
+                                case "weekly":
+                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                                    int weekNumber = revenue.saleDate().get(weekFields.weekOfWeekBasedYear());
+                                    int weekYear = revenue.saleDate().getYear();
+                                    return STR."Week \{weekNumber}, \{weekYear}";
+                                case "yearly":
+                                    int year = revenue.saleDate().getYear();
+                                    return STR."Year \{year}";
+                                default:
+                                    return STR."\{revenue.saleDate()
+                                            .getMonth().
+                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                            }\{revenue.saleDate().getYear()}";
+                            }
+                        },
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                revenueList -> new TimeRevenueSummaryDTO(revenueList, revenueList.size())
+                        )
+                ));
+    }
+
+    public Map<String, TimeExpensesSummaryDTO> listarDespesasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
+        List<Expenses> expenses = expensesRepository.findAllBypaymentDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+
+        return expenses.stream()
+                .map(this::listarDespesas)
+                .collect(Collectors.groupingBy(
+                        expense -> {
+                            switch (groupingType.toLowerCase()) {
+                                case "weekly":
+                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                                    int weekNumber = expense.paymentDate().get(weekFields.weekOfWeekBasedYear());
+                                    int weekYear = expense.paymentDate().getYear();
+                                    return STR."Week \{weekNumber}, \{weekYear}";
+                                case "yearly":
+                                    int year = expense.paymentDate().getYear();
+                                    return STR."Year \{year}";
+                                default:
+                                    return STR."\{expense.paymentDate()
+                                            .getMonth().
+                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                            }\{expense.paymentDate().getYear()}";
+                            }
+                        },
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                expenseList -> new TimeExpensesSummaryDTO(expenseList, expenseList.size())
+                        )
+                ));
     }
 }
