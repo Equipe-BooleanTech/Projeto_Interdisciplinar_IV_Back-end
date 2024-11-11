@@ -1,8 +1,7 @@
 package com.example.Restaurantto.PDV.controller.product;
 
-import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
-import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
-import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
+import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.product.*;
 import com.example.Restaurantto.PDV.exception.product.*;
 import com.example.Restaurantto.PDV.model.product.Ingredient;
 import com.example.Restaurantto.PDV.model.product.Supplier;
@@ -18,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -105,8 +105,8 @@ public class ProductController {
     }
 
     @GetMapping("/get-ingredients")
-    public ResponseEntity<Page<IngredientDTO>> listarTodosIngredientes(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
-        Page<IngredientDTO> ingredients = ingredientService.listarTodosIngredientes(PageRequest.of(page,size));
+    public ResponseEntity<Page<GetIngredientDTO>> listarTodosIngredientes(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        Page<GetIngredientDTO> ingredients = ingredientService.listarTodosIngredientes(PageRequest.of(page,size));
         return ResponseEntity.ok(ingredients);
     }
 
@@ -139,4 +139,36 @@ public class ProductController {
         }
     }
 
+    @PostMapping("/list-ingredients-by-period")
+    public ResponseEntity<?> listarIngredientesPorPeriodo(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType) {
+        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
+        // PASSANDO A URL ASSIM list-ingredients-by-period?groupingType=weekly ELE LISTA POR SEMANA
+        // PASSANDO A URL ASSIM list-ingredients-by-period?groupingType=yearly ELE LISTA POR ANO
+        Map<String, TimeIngredientSummaryDTO> ingredientesPorPeriodo = ingredientService.listarIngredientesPorPeriodo(dateRangeDTO, groupingType);
+
+        if (ingredientesPorPeriodo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("NENHUM INGREDIENTE ENCONTRADO NO PERÍODO ESPECIFICADO");
+        } else {
+            return ResponseEntity.ok(ingredientesPorPeriodo);
+        }
+    }
+    @PostMapping("/list-suppliers-by-period")
+    public ResponseEntity<?> listarfornecedoresPorPeriodo(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType) {
+        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
+        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=weekly ELE LISTA POR SEMANA
+        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=yearly ELE LISTA POR ANO
+        Map<String, TimeSupplierSummaryDTO> fornecedoresPorPeriodo = supplierService.listarForncedoresPorPeriodo(dateRangeDTO, groupingType);
+
+        if (fornecedoresPorPeriodo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("NENHUM FORNCEDOR ENCONTRADO NO PERÍODO ESPECIFICADO");
+        } else {
+            return ResponseEntity.ok(fornecedoresPorPeriodo);
+        }
+    }
 }
