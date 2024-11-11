@@ -1,7 +1,9 @@
 package com.example.Restaurantto.PDV.controller.groupSheet;
 
+import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GroupSheetDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GetGroupSheetDTO;
+import com.example.Restaurantto.PDV.dto.groupSheet.TimeGroupSheetSummaryDTO;
 import com.example.Restaurantto.PDV.service.groupSheet.GroupSheetService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -46,5 +49,21 @@ public class GroupSheetController {
     public ResponseEntity<Page<GetGroupSheetDTO>> listarTodosGroupSheets(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<GetGroupSheetDTO> groupSheets = groupSheetService.listarTodosGroupSheets(PageRequest.of(page, size));
         return ResponseEntity.ok(groupSheets);
+    }
+    @PostMapping("/list-groupsheets-by-period")
+    public ResponseEntity<?> listarGrupoDeFichasPorPeriodo(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType) {
+        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
+        // PASSANDO A URL ASSIM list-groupsheets-by-period?groupingType=weekly ELE LISTA POR SEMANA
+        // PASSANDO A URL ASSIM list-groupsheets-by-period?groupingType=yearly ELE LISTA POR ANO
+        Map<String, TimeGroupSheetSummaryDTO> grupoDeFichasPorPeriodo = groupSheetService.listarGrupoDeFichasPorPeriodo(dateRangeDTO, groupingType);
+
+        if (grupoDeFichasPorPeriodo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("NENHUMA FICHA ENCONTRADA NO PERÍODO ESPECIFICADO");
+        } else {
+            return ResponseEntity.ok(grupoDeFichasPorPeriodo);
+        }
     }
 }
