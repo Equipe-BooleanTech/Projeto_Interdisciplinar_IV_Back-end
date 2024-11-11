@@ -1,11 +1,14 @@
 package com.example.Restaurantto.PDV.service.user;
 
+import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
 import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.exception.user.EmailAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.user.InvalidCredentialsException;
+import com.example.Restaurantto.PDV.model.product.Supplier;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
@@ -25,7 +28,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -65,6 +72,7 @@ public class UserService {
                 .state(null)
                 .neighborhood(null)
                 .cnpj(null)
+                .createdAt(LocalDate.now())
                 .build();
 
         userRepository.save(newUser);
@@ -105,6 +113,7 @@ public class UserService {
         user.setEnterprise(createUserDTO.enterprise());
         user.setEmployee(createUserDTO.isEmployee());
         user.setRole(ModelRole.builder().name(Role.ROLE_USER).build());
+
 
         user.setProspecting(false);
 
@@ -147,6 +156,7 @@ public class UserService {
                 .isProspecting(createUserDTO.isProspecting())
                 .isEmployee(createUserDTO.isEmployee())
                 .function(createUserDTO.function())
+                .createdAt(LocalDate.now())
                 .build();
         userRepository.save(newUser);
 
@@ -255,7 +265,8 @@ public class UserService {
                 user.isProspecting(),
                 user.isEmployee(),
                 user.getFunction(),
-                user.getPassword()
+                user.getPassword(),
+                user.getCreatedAt()
         );
     }
 
@@ -266,6 +277,36 @@ public class UserService {
 
     public Optional<ModelUser> listarPeloId(UUID id) {
         return userRepository.findById(id);
+    }
+
+    public Map<String, TimeUsersSummaryDTO> listarUsuariosPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
+        List<ModelUser> users = userRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+
+        return users.stream()
+                .map(this::mapToUserDTO)
+                .collect(Collectors.groupingBy(
+                        user -> {
+                            switch (groupingType.toLowerCase()) {
+                                case "weekly":
+                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                                    int weekNumber = user.createdAt().get(weekFields.weekOfWeekBasedYear());
+                                    int weekYear = user.createdAt().getYear();
+                                    return STR."Week \{weekNumber}, \{weekYear}";
+                                case "yearly":
+                                    int year = user.createdAt().getYear();
+                                    return STR."Year \{year}";
+                                default:
+                                    return STR."\{user.createdAt()
+                                            .getMonth().
+                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
+                                            }\{user.createdAt().getYear()}";
+                            }
+                        },
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                userList -> new TimeUsersSummaryDTO(userList, userList.size())
+                        )
+                ));
     }
 
 }

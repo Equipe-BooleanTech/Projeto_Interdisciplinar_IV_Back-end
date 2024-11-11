@@ -1,5 +1,7 @@
 package com.example.Restaurantto.PDV.controller.user;
 
+import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
 import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
@@ -26,6 +28,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -155,5 +158,21 @@ public class UserController {
     }
 
 
+    @PostMapping("/list-users-by-period")
+    public ResponseEntity<?> listarUsuariosPorPeriodo(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType) {
+        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
+        // PASSANDO A URL ASSIM list-users-by-period?groupingType=weekly ELE LISTA POR SEMANA
+        // PASSANDO A URL ASSIM list-users-by-period?groupingType=yearly ELE LISTA POR ANO
+        Map<String, TimeUsersSummaryDTO> usuariosPorPeriodo = userService.listarUsuariosPorPeriodo(dateRangeDTO, groupingType);
+
+        if (usuariosPorPeriodo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("NENHUM USUARIO ENCONTRADO NO PERÍODO ESPECIFICADO");
+        } else {
+            return ResponseEntity.ok(usuariosPorPeriodo);
+        }
+    }
 }
 

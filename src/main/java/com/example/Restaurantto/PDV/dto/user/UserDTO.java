@@ -4,6 +4,7 @@ import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,5 +26,6 @@ public record UserDTO(UUID id,
                       Boolean isProspecting,
                       Boolean isEmployee,
                       String function,
-                      @JsonIgnore String password) {
+                      @JsonIgnore String password,
+                      LocalDate createdAt) {
 }

@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +44,9 @@ public class ModelUser {
     private boolean isProspecting;
     private boolean isEmployee;
     private String function;
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDate createdAt;
 
 public Boolean isReadyForActivation() {
 
