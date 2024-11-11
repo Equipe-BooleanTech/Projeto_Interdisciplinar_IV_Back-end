@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +25,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(csrf -> csrf.disable())  // Desabilita CSRF para APIs REST
+                .csrf(AbstractHttpConfigurer::disable)  // Desabilita CSRF para APIs REST
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
@@ -43,6 +44,7 @@ public class SecurityConfig {
                                 "/api/users/get-users",
                                 "/api/users/get-users-by-id/{id}",
                                 "/api/users/create-complete",
+                                "/api/users/list-users-by-period",
                                 "/api/products/create-supplier",
                                 "/api/products/create-ingredient",
                                 "/api/products/update-supplier/{id}",
@@ -53,10 +55,14 @@ public class SecurityConfig {
                                 "/api/products/get-supplier-by-id/{id}",
                                 "/api/products/get-ingredient-by-id/{id}",
                                 "/api/products/get-ingredients",
+                                "/api/products/list-ingredients-by-period",
+                                "/api/products/list-suppliers-by-period",
                                 "/api/financials/get-all-expenses",
                                 "/api/financials/get-all-revenues",
                                 "/api/financials/total-expenses",
                                 "/api/financials/total-revenue",
+                                "/api/financials/list-expenses-by-period",
+                                "/api/financials/list-revenues-by-period",
                                 "/api/financials/cash-flow",
                                 "/api/financials/create-expense",
                                 "/api/financials/create-revenue",
@@ -74,8 +80,14 @@ public class SecurityConfig {
                                 "/api/datasheets/update-datasheet/{id}",
                                 "/api/datasheets/delete-datasheet/{id}",
                                 "/api/datasheets/get-datasheets",
-                                "/api/datasheets/get-datasheet-by-id/{id}"
-                        ).hasAnyRole(
+                                "/api/datasheets/list-datasheets-by-period",
+                                "/api/datasheets/get-datasheet-by-id/{id}",
+                                "/api/groupsheets/create-groupsheet",
+                                "/api/groupsheets/update-groupsheet/{id}",
+                                "/api/groupsheets/delete-groupsheet/{id}",
+                                "/api/groupsheets/get-groupsheets",
+                                "/api/groupsheets/list-groupsheets-by-period"
+                                ).hasAnyRole(
                                 "CHEF", "ADMIN"
                         )
                         .requestMatchers(
