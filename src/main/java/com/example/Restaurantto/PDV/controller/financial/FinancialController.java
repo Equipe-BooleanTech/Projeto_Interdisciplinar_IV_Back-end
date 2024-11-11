@@ -1,12 +1,11 @@
 package com.example.Restaurantto.PDV.controller.financial;
 
-import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
-import com.example.Restaurantto.PDV.dto.financial.ExpensesDTO;
-import com.example.Restaurantto.PDV.dto.financial.FinancialSummaryDTO;
-import com.example.Restaurantto.PDV.dto.financial.RevenueDTO;
+import com.example.Restaurantto.PDV.dto.financial.*;
+import com.example.Restaurantto.PDV.dto.product.TimeIngredientSummaryDTO;
 import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
 import com.example.Restaurantto.PDV.model.financial.Expenses;
 import com.example.Restaurantto.PDV.model.financial.Revenue;
+import com.example.Restaurantto.PDV.response.InformationResponse;
 import com.example.Restaurantto.PDV.response.SuccessResponse;
 import com.example.Restaurantto.PDV.service.financial.FinancialService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -76,16 +76,18 @@ public class FinancialController {
     }
 
     @PostMapping("/total-expenses")
-    public ResponseEntity<BigDecimal> getTotalExpenses(@RequestBody DateRangeDTO dateRangeDTO) {
+    public ResponseEntity<InformationResponse> getTotalExpenses(@RequestBody DateRangeDTO dateRangeDTO) {
         BigDecimal totalExpenses = financialService.calcularTotalDespesas(dateRangeDTO);
-        return new ResponseEntity<>(totalExpenses, HttpStatus.OK);
+        InformationResponse response = new InformationResponse("Total de Despesas",totalExpenses);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @PostMapping("/total-revenue")
-    public ResponseEntity<BigDecimal> getTotalRevenue(@RequestBody DateRangeDTO dateRangeDTO) {
+    public ResponseEntity<InformationResponse> getTotalRevenue(@RequestBody DateRangeDTO dateRangeDTO) {
         BigDecimal totalRevenue = financialService.calcularTotalReceitas(dateRangeDTO);
-        return new ResponseEntity<>(totalRevenue, HttpStatus.OK);
+        InformationResponse response = new InformationResponse("Total de Receitas",totalRevenue);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -141,4 +143,39 @@ public class FinancialController {
             throw e;
         }
     }
+
+    @PostMapping("/list-revenues-by-period")
+    public ResponseEntity<?> listarReceitasPorPeriodo(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType) {
+        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
+        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=weekly ELE LISTA POR SEMANA
+        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=yearly ELE LISTA POR ANO
+        Map<String, TimeRevenueSummaryDTO> receitasPorPeriodo = financialService.listarReceitasPorPeriodo(dateRangeDTO, groupingType);
+
+        if (receitasPorPeriodo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("NENHUMA RECEITA ENCONTRADA NO PERÍODO ESPECIFICADO");
+        } else {
+            return ResponseEntity.ok(receitasPorPeriodo);
+        }
+    }
+
+    @PostMapping("/list-expenses-by-period")
+    public ResponseEntity<?> listarDespesasPorPeriodo(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType) {
+        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
+        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=weekly ELE LISTA POR SEMANA
+        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=yearly ELE LISTA POR ANO
+        Map<String, TimeExpensesSummaryDTO> despesasPorPeriodo = financialService.listarDespesasPorPeriodo(dateRangeDTO, groupingType);
+
+        if (despesasPorPeriodo.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("NENHUMA DESPESA ENCONTRADA NO PERÍODO ESPECIFICADO");
+        } else {
+            return ResponseEntity.ok(despesasPorPeriodo);
+        }
+    }
+
 }

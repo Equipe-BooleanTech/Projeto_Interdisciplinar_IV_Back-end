@@ -9,5 +9,6 @@ import java.util.UUID;
 
 public interface ExpensesRepository extends JpaRepository<Expenses, UUID> {
     List<Expenses> findByPaymentDateBetween(LocalDate start, LocalDate end);
+    List<Expenses> findAllBypaymentDateBetween(LocalDate start, LocalDate end);
 
 }
