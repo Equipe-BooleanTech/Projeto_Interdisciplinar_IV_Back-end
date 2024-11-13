@@ -22,7 +22,7 @@ public class ModelRole {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Role name;
 
 

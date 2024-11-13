@@ -26,7 +26,7 @@ public class ModelUser {
     @Column(unique = true)
     private String email;
     private String password;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id")
     private ModelRole role;
     private String fullName;

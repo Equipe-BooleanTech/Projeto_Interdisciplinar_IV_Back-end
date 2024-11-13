@@ -1,14 +1,13 @@
 package com.example.Restaurantto.PDV.service.user;
 
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
-import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
 import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
 import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.exception.user.EmailAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.user.InvalidCredentialsException;
-import com.example.Restaurantto.PDV.model.product.Supplier;
+import com.example.Restaurantto.PDV.exception.user.UserNotFoundException;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
@@ -36,28 +35,47 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+
+    private final UserRepository userRepository;
+    private final  RoleRepository roleRepository;
+    private final SecurityConfig securityConfig;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenService jwtTokenService;
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private SecurityConfig securityConfig;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenService jwtTokenService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, SecurityConfig securityConfig, AuthenticationManager authenticationManager, JwtTokenService jwtTokenService, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.securityConfig = securityConfig;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenService = jwtTokenService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+
+    public UUID buscarIdPorEmail(String email) {
+        ModelUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(STR."Usuário não encontrado com o email: \{email}"));
+        return user.getId();
+    }
+
+    public String buscarNomePorEmail(String email) {
+        ModelUser user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(STR."Usuário não encontrado com o email: \{email}"));
+        return user.getFullName();
+    }
 
     public UUID salvarUsuarioProspeccao(ProspectingUserDTO prospectingUserDTO) {
         if (userRepository.findByEmail(prospectingUserDTO.email()).isPresent()) {
             throw new EmailAlreadyRegisteredException("E-MAIL JÁ CADASTRADO");
         }
-
+        ModelRole role = roleRepository.findByName(Role.valueOf(Role.ROLE_INACTIVE.name()))
+                .orElseThrow(() -> new RuntimeException("Role não encontrada"));
 
         ModelUser newUser = ModelUser.builder()
                 .email(prospectingUserDTO.email())
-                .role(ModelRole.builder().name(Role.ROLE_INACTIVE).build())
+                .role(role)
                 .fullName(prospectingUserDTO.fullName())
                 .phone(prospectingUserDTO.phone())
                 .enterprise(prospectingUserDTO.enterprise())
@@ -99,6 +117,8 @@ public class UserService {
         if (!user.isProspecting()) {
             throw new IllegalStateException("O USUÁRIO JÁ ESTÁ ATIVADO");
         }
+        ModelRole role = roleRepository.findByName(Role.valueOf(Role.ROLE_USER.name()))
+                .orElseThrow(() -> new RuntimeException("Role não encontrada"));
 
         user.setCpf(createUserDTO.cpf());
         user.setCep(createUserDTO.cep());
@@ -112,7 +132,7 @@ public class UserService {
         user.setFullName(createUserDTO.fullName());
         user.setEnterprise(createUserDTO.enterprise());
         user.setEmployee(createUserDTO.isEmployee());
-        user.setRole(ModelRole.builder().name(Role.ROLE_USER).build());
+        user.setRole(role);
 
 
         user.setProspecting(false);
@@ -137,10 +157,13 @@ public class UserService {
             throw new EmailAlreadyRegisteredException("E-MAIL JÁ CADASTRADO");
         }
 
+        ModelRole role = roleRepository.findByName(Role.valueOf(createUserDTO.role()))
+                .orElseThrow(() -> new RuntimeException("Role não encontrada"));
+
         ModelUser newUser = ModelUser.builder()
                 .email(createUserDTO.email())
                 .password(securityConfig.passwordEncoder().encode(createUserDTO.password()))
-                .role(ModelRole.builder().name(Role.valueOf(createUserDTO.role())).build())
+                .role(role)
                 .fullName(createUserDTO.fullName())
                 .phone(createUserDTO.phone())
                 .cpf(createUserDTO.cpf())
