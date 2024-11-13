@@ -1,5 +1,6 @@
 package com.example.Restaurantto.PDV.controller.user;
 
+import com.example.Restaurantto.PDV.dto.auth.LoginResponseDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
 import com.example.Restaurantto.PDV.dto.user.*;
@@ -41,9 +42,17 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<JwtTokenDTO> loginUsuario(@RequestBody @Valid LoginUserDTO loginUserDTO) {
-        JwtTokenDTO token = userService.authenticarUsuario(loginUserDTO);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<?> loginUsuario(@RequestBody @Valid LoginUserDTO loginUserDTO) {
+        try {
+            JwtTokenDTO tokenDTO = userService.authenticarUsuario(loginUserDTO);
+            UUID userId = userService.buscarIdPorEmail(loginUserDTO.email());
+            String fullName = userService.buscarNomePorEmail(loginUserDTO.email());
+            LoginResponseDTO response = new LoginResponseDTO(userId, fullName, tokenDTO.token());
+            return ResponseEntity.ok().body(response);
+
+        } catch (UserNotFoundException e) {
+            throw e;
+        }
     }
 
 
