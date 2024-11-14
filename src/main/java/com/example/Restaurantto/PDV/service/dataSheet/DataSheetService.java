@@ -2,10 +2,9 @@ package com.example.Restaurantto.PDV.service.dataSheet;
 
 import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
 import com.example.Restaurantto.PDV.dto.dataSheet.GetDataSheetDTO;
-import com.example.Restaurantto.PDV.dto.dataSheet.TimeDataSheetSummaryDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
-import com.example.Restaurantto.PDV.dto.user.TimeUsersSummaryDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
@@ -122,14 +121,14 @@ public class DataSheetService {
     }
 
 
-        public TimeDataSheetSummaryDTO listarFichasPorPeriodo(DateRangeDTO dateRangeDTO) {
+        public TimeSummaryDTO listarFichasPorPeriodo(DateRangeDTO dateRangeDTO) {
             List<DataSheet> data = dataSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
             List<GetDataSheetDTO> dataSheetDTOList = data.stream()
                     .map(this::mapearParaGetDataSheetDTO)
-                    .collect(Collectors.toList());
+                    .toList();
 
-            return new TimeDataSheetSummaryDTO(dataSheetDTOList, dataSheetDTOList.size());
+            return new TimeSummaryDTO(Collections.singletonList(dataSheetDTOList), dataSheetDTOList.size());
         }
     }
 

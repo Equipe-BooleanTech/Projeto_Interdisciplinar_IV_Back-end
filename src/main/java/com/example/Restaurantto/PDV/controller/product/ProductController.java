@@ -1,6 +1,7 @@
 package com.example.Restaurantto.PDV.controller.product;
 
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.product.*;
 import com.example.Restaurantto.PDV.exception.product.*;
 import com.example.Restaurantto.PDV.model.product.Ingredient;
@@ -143,9 +144,9 @@ public class ProductController {
     public ResponseEntity<?> listarIngredientesPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        TimeIngredientSummaryDTO ingredientesPorPeriodo = ingredientService.listarIngredientesPorPeriodo(dateRangeDTO);
+        TimeSummaryDTO ingredientesPorPeriodo = ingredientService.listarIngredientesPorPeriodo(dateRangeDTO);
 
-        if (ingredientesPorPeriodo.ingredients().isEmpty()) {
+        if (ingredientesPorPeriodo.data().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUM INGREDIENTE ENCONTRADO NO PERÍODO ESPECIFICADO");
         } else {
@@ -156,9 +157,9 @@ public class ProductController {
     public ResponseEntity<?> listarfornecedoresPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        TimeSupplierSummaryDTO fornecedoresPorPeriodo = supplierService.listarfornecedoresPorPeriodo(dateRangeDTO);
+        TimeSummaryDTO fornecedoresPorPeriodo = supplierService.listarfornecedoresPorPeriodo(dateRangeDTO);
 
-        if (fornecedoresPorPeriodo.suppliers().isEmpty()) {
+        if (fornecedoresPorPeriodo.data().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUM FORNCEDOR ENCONTRADO NO PERÍODO ESPECIFICADO");
         } else {

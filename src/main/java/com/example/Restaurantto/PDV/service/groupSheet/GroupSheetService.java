@@ -1,11 +1,10 @@
 package com.example.Restaurantto.PDV.service.groupSheet;
 
 import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
-import com.example.Restaurantto.PDV.dto.dataSheet.TimeDataSheetSummaryDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GetGroupSheetDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GroupSheetDTO;
-import com.example.Restaurantto.PDV.dto.groupSheet.TimeGroupSheetSummaryDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.exception.groupSheet.GroupSheetAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.groupSheet.GroupSheetNotFoundException;
@@ -20,8 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,33 +136,13 @@ public class GroupSheetService {
         return groupSheetRepository.findById(id);
     }
 
-    public Map<String, TimeGroupSheetSummaryDTO> listarGrupoDeFichasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
-        List<GroupSheet> groupSheets = groupSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+    public TimeSummaryDTO listarGrupoDeFichasPorPeriodo(DateRangeDTO dateRangeDTO) {
+        List<GroupSheet> data = groupSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
-        return groupSheets.stream()
+        List<GetGroupSheetDTO> dataSheetDTOList = data.stream()
                 .map(this::mapearParaGetGroupSheetDTO)
-                .collect(Collectors.groupingBy(
-                        groupSheet -> {
-                            switch (groupingType.toLowerCase()) {
-                                case "weekly":
-                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
-                                    int weekNumber = groupSheet.createdAt().get(weekFields.weekOfWeekBasedYear());
-                                    int weekYear = groupSheet.createdAt().getYear();
-                                    return STR."Week \{weekNumber}, \{weekYear}";
-                                case "yearly":
-                                    int year = groupSheet.createdAt().getYear();
-                                    return STR."Year \{year}";
-                                default:
-                                    return STR."\{groupSheet.createdAt()
-                                            .getMonth().
-                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                            }\{groupSheet.createdAt().getYear()}";
-                            }
-                        },
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                groupSheetList -> new TimeGroupSheetSummaryDTO(groupSheetList, groupSheetList.size())
-                        )
-                ));
+                .toList();
+
+        return new TimeSummaryDTO(Collections.singletonList(dataSheetDTOList), dataSheetDTOList.size());
     }
 }

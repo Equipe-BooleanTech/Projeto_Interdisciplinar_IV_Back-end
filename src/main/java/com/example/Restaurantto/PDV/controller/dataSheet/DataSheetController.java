@@ -2,11 +2,9 @@ package com.example.Restaurantto.PDV.controller.dataSheet;
 
 import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
 import com.example.Restaurantto.PDV.dto.dataSheet.GetDataSheetDTO;
-import com.example.Restaurantto.PDV.dto.dataSheet.TimeDataSheetSummaryDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
-import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
-import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
 import com.example.Restaurantto.PDV.service.dataSheet.DataSheetService;
 import jakarta.validation.Valid;
@@ -17,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -77,9 +74,9 @@ public class DataSheetController {
     public ResponseEntity<?> listarFichasPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        TimeDataSheetSummaryDTO fichasPorPeriodo = dataSheetService.listarFichasPorPeriodo(dateRangeDTO);
+        TimeSummaryDTO fichasPorPeriodo = dataSheetService.listarFichasPorPeriodo(dateRangeDTO);
 
-        if (fichasPorPeriodo.dataSheet().isEmpty()) {
+        if (fichasPorPeriodo.data().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUMA FICHA ENCONTRADA NO PERÍODO ESPECIFICADO");
         } else {

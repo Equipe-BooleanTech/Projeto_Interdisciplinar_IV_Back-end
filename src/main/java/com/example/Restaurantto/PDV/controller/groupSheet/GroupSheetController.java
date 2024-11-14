@@ -1,9 +1,9 @@
 package com.example.Restaurantto.PDV.controller.groupSheet;
 
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GroupSheetDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GetGroupSheetDTO;
-import com.example.Restaurantto.PDV.dto.groupSheet.TimeGroupSheetSummaryDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
 import com.example.Restaurantto.PDV.model.groupSheet.GroupSheet;
 import com.example.Restaurantto.PDV.service.groupSheet.GroupSheetService;
@@ -75,11 +75,11 @@ public class GroupSheetController {
         // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
         // PASSANDO A URL ASSIM list-groupsheets-by-period?groupingType=weekly ELE LISTA POR SEMANA
         // PASSANDO A URL ASSIM list-groupsheets-by-period?groupingType=yearly ELE LISTA POR ANO
-        Map<String, TimeGroupSheetSummaryDTO> grupoDeFichasPorPeriodo = groupSheetService.listarGrupoDeFichasPorPeriodo(dateRangeDTO, groupingType);
+        TimeSummaryDTO grupoDeFichasPorPeriodo = groupSheetService.listarGrupoDeFichasPorPeriodo(dateRangeDTO);
 
-        if (grupoDeFichasPorPeriodo.isEmpty()) {
+        if (grupoDeFichasPorPeriodo.data().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("NENHUMA FICHA ENCONTRADA NO PERÍODO ESPECIFICADO");
+                    .body("NENHUM GRUPO DE FICHA ENCONTRADO NO PERÍODO ESPECIFICADO");
         } else {
             return ResponseEntity.ok(grupoDeFichasPorPeriodo);
         }
