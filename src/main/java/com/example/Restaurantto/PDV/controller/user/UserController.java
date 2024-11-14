@@ -2,16 +2,14 @@ package com.example.Restaurantto.PDV.controller.user;
 
 import com.example.Restaurantto.PDV.dto.auth.LoginResponseDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
-import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
-import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.exception.user.UserCreationFailedException;
 import com.example.Restaurantto.PDV.exception.user.UserDeletionFailedException;
 import com.example.Restaurantto.PDV.exception.user.UserNotFoundException;
 import com.example.Restaurantto.PDV.exception.user.UserUpdateFailedException;
-import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
 import com.example.Restaurantto.PDV.response.SuccessResponse;
@@ -23,13 +21,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -171,8 +166,8 @@ public class UserController {
     public ResponseEntity<?> listarUsuariosPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        TimeUsersSummaryDTO usuariosPorPeriodo = userService.listarUsuariosPorPeriodo(dateRangeDTO);
-        if (usuariosPorPeriodo.users().isEmpty()) {
+        TimeSummaryDTO usuariosPorPeriodo = userService.listarUsuariosPorPeriodo(dateRangeDTO);
+        if (usuariosPorPeriodo.data().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUM USUARIO ENCONTRADO NO PERÍODO ESPECIFICADO");
         } else {

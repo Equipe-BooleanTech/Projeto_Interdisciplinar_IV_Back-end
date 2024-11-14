@@ -1,6 +1,7 @@
 package com.example.Restaurantto.PDV.service.user;
 
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.user.*;
 import com.example.Restaurantto.PDV.dto.auth.JwtTokenDTO;
 import com.example.Restaurantto.PDV.dto.auth.LoginUserDTO;
@@ -28,10 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -302,14 +300,14 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public TimeUsersSummaryDTO listarUsuariosPorPeriodo(DateRangeDTO dateRangeDTO) {
+    public TimeSummaryDTO listarUsuariosPorPeriodo(DateRangeDTO dateRangeDTO) {
         List<ModelUser> users = userRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<UserDTO> userList = users.stream()
                 .map(this::mapToUserDTO)
-                .collect(Collectors.toList());
+                .toList();
 
-        return new TimeUsersSummaryDTO(userList, userList.size());
+        return new TimeSummaryDTO(Collections.singletonList(userList), userList.size());
     }
 
 }

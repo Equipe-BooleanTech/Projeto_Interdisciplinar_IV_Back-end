@@ -1,10 +1,9 @@
 package com.example.Restaurantto.PDV.service.product;
 
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.product.GetIngredientDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
-import com.example.Restaurantto.PDV.dto.product.TimeIngredientSummaryDTO;
-import com.example.Restaurantto.PDV.dto.user.TimeUsersSummaryDTO;
 import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
 import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.model.product.Ingredient;
@@ -102,13 +101,13 @@ public class IngredientService {
         return ingredientRepository.findById(id);
     }
 
-    public TimeIngredientSummaryDTO listarIngredientesPorPeriodo(DateRangeDTO dateRangeDTO) {
+    public TimeSummaryDTO listarIngredientesPorPeriodo(DateRangeDTO dateRangeDTO) {
         List<Ingredient> ingredients = ingredientRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<GetIngredientDTO> ingredientDTOList = ingredients.stream()
                 .map(this::listarIngrediente)
-                .collect(Collectors.toList());
+                .toList();
 
-        return new TimeIngredientSummaryDTO(ingredientDTOList, ingredientDTOList.size());
+        return new TimeSummaryDTO(Collections.singletonList(ingredientDTOList), ingredientDTOList.size());
     }
 }

@@ -1,6 +1,7 @@
 package com.example.Restaurantto.PDV.service.financial;
 
 import com.example.Restaurantto.PDV.dto.financial.*;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.exception.financial.NoFinancialRecordsException;
 import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
 import com.example.Restaurantto.PDV.model.financial.Expenses;
@@ -13,10 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.format.TextStyle;
-import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FinancialService {
@@ -147,63 +145,22 @@ public class FinancialService {
         );
     }
 
-    public Map<String, TimeRevenueSummaryDTO> listarReceitasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
-        List<Revenue> revenues = revenueRepository.findAllBysaleDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+    public TimeSummaryDTO listarReceitasPorPeriodo(DateRangeDTO dateRangeDTO) {
+        List<Revenue> data = revenueRepository.findAllBysaleDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
-        return revenues.stream()
+        List<RevenueDTO> revenueDTOList = data.stream()
                 .map(this::listarReceitas)
-                .collect(Collectors.groupingBy(
-                        revenue -> {
-                            switch (groupingType.toLowerCase()) {
-                                case "weekly":
-                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
-                                    int weekNumber = revenue.saleDate().get(weekFields.weekOfWeekBasedYear());
-                                    int weekYear = revenue.saleDate().getYear();
-                                    return STR."Week \{weekNumber}, \{weekYear}";
-                                case "yearly":
-                                    int year = revenue.saleDate().getYear();
-                                    return STR."Year \{year}";
-                                default:
-                                    return STR."\{revenue.saleDate()
-                                            .getMonth().
-                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                            }\{revenue.saleDate().getYear()}";
-                            }
-                        },
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                revenueList -> new TimeRevenueSummaryDTO(revenueList, revenueList.size())
-                        )
-                ));
+                .toList();
+
+        return new TimeSummaryDTO(Collections.singletonList(revenueDTOList), revenueDTOList.size());
     }
+    public TimeSummaryDTO listarDespesasPorPeriodo(DateRangeDTO dateRangeDTO) {
+        List<Expenses> data = expensesRepository.findAllBypaymentDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
-    public Map<String, TimeExpensesSummaryDTO> listarDespesasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
-        List<Expenses> expenses = expensesRepository.findAllBypaymentDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
-
-        return expenses.stream()
+        List<ExpensesDTO> expensesDTOList = data.stream()
                 .map(this::listarDespesas)
-                .collect(Collectors.groupingBy(
-                        expense -> {
-                            switch (groupingType.toLowerCase()) {
-                                case "weekly":
-                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
-                                    int weekNumber = expense.paymentDate().get(weekFields.weekOfWeekBasedYear());
-                                    int weekYear = expense.paymentDate().getYear();
-                                    return STR."Week \{weekNumber}, \{weekYear}";
-                                case "yearly":
-                                    int year = expense.paymentDate().getYear();
-                                    return STR."Year \{year}";
-                                default:
-                                    return STR."\{expense.paymentDate()
-                                            .getMonth().
-                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                            }\{expense.paymentDate().getYear()}";
-                            }
-                        },
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                expenseList -> new TimeExpensesSummaryDTO(expenseList, expenseList.size())
-                        )
-                ));
+                .toList();
+
+        return new TimeSummaryDTO(Collections.singletonList(expensesDTOList), expensesDTOList.size());
     }
 }

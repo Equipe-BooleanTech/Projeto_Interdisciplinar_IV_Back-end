@@ -1,7 +1,7 @@
 package com.example.Restaurantto.PDV.controller.financial;
 
 import com.example.Restaurantto.PDV.dto.financial.*;
-import com.example.Restaurantto.PDV.dto.product.TimeIngredientSummaryDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
 import com.example.Restaurantto.PDV.model.financial.Expenses;
 import com.example.Restaurantto.PDV.model.financial.Revenue;
@@ -148,12 +148,9 @@ public class FinancialController {
     public ResponseEntity<?> listarReceitasPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
-        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=weekly ELE LISTA POR SEMANA
-        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=yearly ELE LISTA POR ANO
-        Map<String, TimeRevenueSummaryDTO> receitasPorPeriodo = financialService.listarReceitasPorPeriodo(dateRangeDTO, groupingType);
+        TimeSummaryDTO receitasPorPeriodo = financialService.listarReceitasPorPeriodo(dateRangeDTO);
 
-        if (receitasPorPeriodo.isEmpty()) {
+        if (receitasPorPeriodo.data().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUMA RECEITA ENCONTRADA NO PERÍODO ESPECIFICADO");
         } else {
@@ -165,12 +162,9 @@ public class FinancialController {
     public ResponseEntity<?> listarDespesasPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
-        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=weekly ELE LISTA POR SEMANA
-        // PASSANDO A URL ASSIM list-expenses-by-period?groupingType=yearly ELE LISTA POR ANO
-        Map<String, TimeExpensesSummaryDTO> despesasPorPeriodo = financialService.listarDespesasPorPeriodo(dateRangeDTO, groupingType);
+        TimeSummaryDTO despesasPorPeriodo = financialService.listarDespesasPorPeriodo(dateRangeDTO);
 
-        if (despesasPorPeriodo.isEmpty()) {
+        if (despesasPorPeriodo.data().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUMA DESPESA ENCONTRADA NO PERÍODO ESPECIFICADO");
         } else {

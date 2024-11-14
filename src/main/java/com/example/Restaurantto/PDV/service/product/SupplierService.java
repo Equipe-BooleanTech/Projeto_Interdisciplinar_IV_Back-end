@@ -1,10 +1,9 @@
 package com.example.Restaurantto.PDV.service.product;
 
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
+import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
-import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
-import com.example.Restaurantto.PDV.dto.user.TimeUsersSummaryDTO;
 import com.example.Restaurantto.PDV.exception.product.SupplierAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.model.product.Supplier;
@@ -80,13 +79,13 @@ public class SupplierService {
         return supplierRepository.findById(id);
     }
 
-    public TimeSupplierSummaryDTO listarfornecedoresPorPeriodo(DateRangeDTO dateRangeDTO) {
+    public TimeSummaryDTO listarfornecedoresPorPeriodo(DateRangeDTO dateRangeDTO) {
         List<Supplier> suppliers = supplierRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<GetSupplierDTO> supplierDTOList = suppliers.stream()
                 .map(this::listarFornecedor)
-                .collect(Collectors.toList());
+                .toList();
 
-        return new TimeSupplierSummaryDTO(supplierDTOList, supplierDTOList.size());
+        return new TimeSummaryDTO(Collections.singletonList(supplierDTOList), supplierDTOList.size());
     }
 }
