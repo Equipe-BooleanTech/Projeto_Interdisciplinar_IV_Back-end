@@ -135,6 +135,10 @@ public class GroupSheetService {
         );
     }
 
+    public Optional<GroupSheet> listarFichaPeloId(UUID id) {
+        return groupSheetRepository.findById(id);
+    }
+
     public Map<String, TimeGroupSheetSummaryDTO> listarGrupoDeFichasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
         List<GroupSheet> groupSheets = groupSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
