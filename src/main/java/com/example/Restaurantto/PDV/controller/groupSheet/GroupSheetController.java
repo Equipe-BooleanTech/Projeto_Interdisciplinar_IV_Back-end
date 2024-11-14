@@ -4,6 +4,8 @@ import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GroupSheetDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.GetGroupSheetDTO;
 import com.example.Restaurantto.PDV.dto.groupSheet.TimeGroupSheetSummaryDTO;
+import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
+import com.example.Restaurantto.PDV.model.groupSheet.GroupSheet;
 import com.example.Restaurantto.PDV.service.groupSheet.GroupSheetService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController

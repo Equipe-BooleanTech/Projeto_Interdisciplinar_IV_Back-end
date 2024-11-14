@@ -171,17 +171,14 @@ public class UserController {
     public ResponseEntity<?> listarUsuariosPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
-        // PASSANDO A URL ASSIM list-users-by-period?groupingType=weekly ELE LISTA POR SEMANA
-        // PASSANDO A URL ASSIM list-users-by-period?groupingType=yearly ELE LISTA POR ANO
-        Map<String, TimeUsersSummaryDTO> usuariosPorPeriodo = userService.listarUsuariosPorPeriodo(dateRangeDTO, groupingType);
-
-        if (usuariosPorPeriodo.isEmpty()) {
+        TimeUsersSummaryDTO usuariosPorPeriodo = userService.listarUsuariosPorPeriodo(dateRangeDTO);
+        if (usuariosPorPeriodo.users().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUM USUARIO ENCONTRADO NO PERÍODO ESPECIFICADO");
         } else {
             return ResponseEntity.ok(usuariosPorPeriodo);
         }
     }
+
 }
 

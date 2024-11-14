@@ -77,12 +77,9 @@ public class DataSheetController {
     public ResponseEntity<?> listarFichasPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
-        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=weekly ELE LISTA POR SEMANA
-        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=yearly ELE LISTA POR ANO
-        Map<String, TimeDataSheetSummaryDTO> fichasPorPeriodo = dataSheetService.listarFichasPorPeriodo(dateRangeDTO, groupingType);
+        TimeDataSheetSummaryDTO fichasPorPeriodo = dataSheetService.listarFichasPorPeriodo(dateRangeDTO);
 
-        if (fichasPorPeriodo.isEmpty()) {
+        if (fichasPorPeriodo.dataSheet().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUMA FICHA ENCONTRADA NO PERÍODO ESPECIFICADO");
         } else {

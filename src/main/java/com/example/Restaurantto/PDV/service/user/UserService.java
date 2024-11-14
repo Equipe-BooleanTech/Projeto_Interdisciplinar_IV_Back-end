@@ -302,34 +302,14 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Map<String, TimeUsersSummaryDTO> listarUsuariosPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
+    public TimeUsersSummaryDTO listarUsuariosPorPeriodo(DateRangeDTO dateRangeDTO) {
         List<ModelUser> users = userRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
-        return users.stream()
+        List<UserDTO> userList = users.stream()
                 .map(this::mapToUserDTO)
-                .collect(Collectors.groupingBy(
-                        user -> {
-                            switch (groupingType.toLowerCase()) {
-                                case "weekly":
-                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
-                                    int weekNumber = user.createdAt().get(weekFields.weekOfWeekBasedYear());
-                                    int weekYear = user.createdAt().getYear();
-                                    return STR."Week \{weekNumber}, \{weekYear}";
-                                case "yearly":
-                                    int year = user.createdAt().getYear();
-                                    return STR."Year \{year}";
-                                default:
-                                    return STR."\{user.createdAt()
-                                            .getMonth().
-                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                            }\{user.createdAt().getYear()}";
-                            }
-                        },
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                userList -> new TimeUsersSummaryDTO(userList, userList.size())
-                        )
-                ));
+                .collect(Collectors.toList());
+
+        return new TimeUsersSummaryDTO(userList, userList.size());
     }
 
 }

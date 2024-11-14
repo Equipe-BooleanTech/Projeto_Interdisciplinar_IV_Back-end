@@ -143,12 +143,9 @@ public class ProductController {
     public ResponseEntity<?> listarIngredientesPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
-        // PASSANDO A URL ASSIM list-ingredients-by-period?groupingType=weekly ELE LISTA POR SEMANA
-        // PASSANDO A URL ASSIM list-ingredients-by-period?groupingType=yearly ELE LISTA POR ANO
-        Map<String, TimeIngredientSummaryDTO> ingredientesPorPeriodo = ingredientService.listarIngredientesPorPeriodo(dateRangeDTO, groupingType);
+        TimeIngredientSummaryDTO ingredientesPorPeriodo = ingredientService.listarIngredientesPorPeriodo(dateRangeDTO);
 
-        if (ingredientesPorPeriodo.isEmpty()) {
+        if (ingredientesPorPeriodo.ingredients().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUM INGREDIENTE ENCONTRADO NO PERÍODO ESPECIFICADO");
         } else {
@@ -159,12 +156,9 @@ public class ProductController {
     public ResponseEntity<?> listarfornecedoresPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
-        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=weekly ELE LISTA POR SEMANA
-        // PASSANDO A URL ASSIM list-suppliers-by-period?groupingType=yearly ELE LISTA POR ANO
-        Map<String, TimeSupplierSummaryDTO> fornecedoresPorPeriodo = supplierService.listarForncedoresPorPeriodo(dateRangeDTO, groupingType);
+        TimeSupplierSummaryDTO fornecedoresPorPeriodo = supplierService.listarfornecedoresPorPeriodo(dateRangeDTO);
 
-        if (fornecedoresPorPeriodo.isEmpty()) {
+        if (fornecedoresPorPeriodo.suppliers().isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("NENHUM FORNCEDOR ENCONTRADO NO PERÍODO ESPECIFICADO");
         } else {

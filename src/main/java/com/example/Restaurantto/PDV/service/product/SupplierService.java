@@ -4,6 +4,7 @@ import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.TimeSupplierSummaryDTO;
+import com.example.Restaurantto.PDV.dto.user.TimeUsersSummaryDTO;
 import com.example.Restaurantto.PDV.exception.product.SupplierAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
 import com.example.Restaurantto.PDV.model.product.Supplier;
@@ -14,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,34 +80,13 @@ public class SupplierService {
         return supplierRepository.findById(id);
     }
 
-    public Map<String, TimeSupplierSummaryDTO> listarForncedoresPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
+    public TimeSupplierSummaryDTO listarfornecedoresPorPeriodo(DateRangeDTO dateRangeDTO) {
         List<Supplier> suppliers = supplierRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
-        return suppliers.stream()
+        List<GetSupplierDTO> supplierDTOList = suppliers.stream()
                 .map(this::listarFornecedor)
-                .collect(Collectors.groupingBy(
-                        supplier -> {
-                            switch (groupingType.toLowerCase()) {
-                                case "weekly":
-                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
-                                    int weekNumber = supplier.createdAt().get(weekFields.weekOfWeekBasedYear());
-                                    int weekYear = supplier.createdAt().getYear();
-                                    return STR."Week \{weekNumber}, \{weekYear}";
-                                case "yearly":
-                                    int year = supplier.createdAt().getYear();
-                                    return STR."Year \{year}";
-                                default:
-                                    return STR."\{supplier.createdAt()
-                                            .getMonth().
-                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                            }\{supplier.createdAt().getYear()}";
-                            }
-                        },
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                supplierList -> new TimeSupplierSummaryDTO(supplierList, supplierList.size())
-                        )
-                ));
-    }
+                .collect(Collectors.toList());
 
+        return new TimeSupplierSummaryDTO(supplierDTOList, supplierDTOList.size());
+    }
 }

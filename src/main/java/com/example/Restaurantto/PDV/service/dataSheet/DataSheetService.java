@@ -5,7 +5,7 @@ import com.example.Restaurantto.PDV.dto.dataSheet.GetDataSheetDTO;
 import com.example.Restaurantto.PDV.dto.dataSheet.TimeDataSheetSummaryDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
-import com.example.Restaurantto.PDV.dto.product.TimeIngredientSummaryDTO;
+import com.example.Restaurantto.PDV.dto.user.TimeUsersSummaryDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
@@ -19,8 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -123,34 +121,15 @@ public class DataSheetService {
         return dataSheetRepository.findById(id);
     }
 
-    public Map<String, TimeDataSheetSummaryDTO> listarFichasPorPeriodo(DateRangeDTO dateRangeDTO, String groupingType) {
-        List<DataSheet> dataSheets = dataSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
-        return dataSheets.stream()
-                .map(this::mapearParaGetDataSheetDTO)
-                .collect(Collectors.groupingBy(
-                        dataSheet -> {
-                            switch (groupingType.toLowerCase()) {
-                                case "weekly":
-                                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
-                                    int weekNumber = dataSheet.createdAt().get(weekFields.weekOfWeekBasedYear());
-                                    int weekYear = dataSheet.createdAt().getYear();
-                                    return STR."Week \{weekNumber}, \{weekYear}";
-                                case "yearly":
-                                    int year = dataSheet.createdAt().getYear();
-                                    return STR."Year \{year}";
-                                default:
-                                    return STR."\{dataSheet.createdAt()
-                                            .getMonth().
-                                            getDisplayName(TextStyle.FULL, Locale.getDefault())
-                                            }\{dataSheet.createdAt().getYear()}";
-                            }
-                        },
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                dataSheetList -> new TimeDataSheetSummaryDTO(dataSheetList, dataSheetList.size())
-                        )
-                ));
-    }
+        public TimeDataSheetSummaryDTO listarFichasPorPeriodo(DateRangeDTO dateRangeDTO) {
+            List<DataSheet> data = dataSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+
+            List<GetDataSheetDTO> dataSheetDTOList = data.stream()
+                    .map(this::mapearParaGetDataSheetDTO)
+                    .collect(Collectors.toList());
+
+            return new TimeDataSheetSummaryDTO(dataSheetDTOList, dataSheetDTOList.size());
+        }
     }
 
