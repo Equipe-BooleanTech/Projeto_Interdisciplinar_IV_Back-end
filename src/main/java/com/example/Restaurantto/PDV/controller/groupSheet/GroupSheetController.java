@@ -50,6 +50,21 @@ public class GroupSheetController {
         Page<GetGroupSheetDTO> groupSheets = groupSheetService.listarTodosGroupSheets(PageRequest.of(page, size));
         return ResponseEntity.ok(groupSheets);
     }
+    @GetMapping("/get-groupsheet-by-id/{id}")
+    public ResponseEntity<?> buscarGrupoDeFichaPorId(@PathVariable UUID id) {
+        try {
+            Optional<GroupSheet> groupSheet = groupSheetService.listarFichaPeloId(id);
+            if (groupSheet.isPresent()){
+                return ResponseEntity.ok(groupSheet);
+            }else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("GRUPO DE FICHA NÃO ENCONTRADA \n ID INVÁLIDO");
+            }
+
+        }catch (DataSheetNotFoundException e){
+            throw e;
+        }
+    }
+    
     @PostMapping("/list-groupsheets-by-period")
     public ResponseEntity<?> listarGrupoDeFichasPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
