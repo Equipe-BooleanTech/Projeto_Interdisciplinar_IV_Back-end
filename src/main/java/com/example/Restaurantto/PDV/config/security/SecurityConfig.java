@@ -86,7 +86,8 @@ public class SecurityConfig {
                                 "/api/groupsheets/update-groupsheet/{id}",
                                 "/api/groupsheets/delete-groupsheet/{id}",
                                 "/api/groupsheets/get-groupsheets",
-                                "/api/groupsheets/list-groupsheets-by-period"
+                                "/api/groupsheets/list-groupsheets-by-period",
+                                "/api/groupsheets/get-groupsheet-by-id/{id}"
                                 ).hasAnyRole(
                                 "CHEF", "ADMIN"
                         )
