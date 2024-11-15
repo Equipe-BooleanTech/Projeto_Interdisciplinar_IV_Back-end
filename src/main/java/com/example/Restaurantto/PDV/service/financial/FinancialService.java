@@ -4,6 +4,8 @@ import com.example.Restaurantto.PDV.dto.financial.*;
 import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.exception.financial.NoFinancialRecordsException;
 import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
+import com.example.Restaurantto.PDV.mapper.financial.ExpenseMapper;
+import com.example.Restaurantto.PDV.mapper.financial.RevenueMapper;
 import com.example.Restaurantto.PDV.model.financial.Expense;
 import com.example.Restaurantto.PDV.model.financial.Revenue;
 import com.example.Restaurantto.PDV.repository.financial.ExpensesRepository;
@@ -19,10 +21,15 @@ import java.util.*;
 @Service
 public class FinancialService {
 
+
+    private final ExpensesRepository expensesRepository;
+    private final RevenueRepository revenueRepository;
+
     @Autowired
-    private ExpensesRepository expensesRepository;
-    @Autowired
-    private RevenueRepository revenueRepository;
+    public FinancialService(ExpensesRepository expensesRepository, RevenueRepository revenueRepository) {
+        this.expensesRepository = expensesRepository;
+        this.revenueRepository = revenueRepository;
+    }
 
 
     public UUID criarDespesa(ExpensesDTO expensesDTO) {
@@ -123,12 +130,12 @@ public class FinancialService {
 
     public Page<ExpensesDTO> listarTodasDespesas(PageRequest pageRequest) {
         return expensesRepository.findAll(pageRequest)
-                .map(this::listarDespesas);
+                .map(ExpenseMapper.INSTANCE::toExpenseDTO);
     }
 
     public Page<RevenueDTO> listarTodasReceitas(PageRequest pageRequest) {
         return revenueRepository.findAll(pageRequest)
-                .map(this::listarReceitas);
+                .map(RevenueMapper.INSTANCE::toRevenueDTO);
     }
     public Optional<Expense> listarDespesaPeloId(UUID id) {
         return expensesRepository.findById(id);
@@ -137,34 +144,12 @@ public class FinancialService {
         return revenueRepository.findById(id);
     }
 
-    private ExpensesDTO listarDespesas(Expense expense) {
-        return new ExpensesDTO(
-                expense.getId(),
-                expense.getDescription(),
-                expense.getCategory(),
-                expense.getAmount(),
-                expense.getPaymentDate()
-        );
-    }
-
-    private RevenueDTO listarReceitas(Revenue revenue) {
-        return new RevenueDTO(
-                revenue.getId(),
-                revenue.getAmount(),
-                revenue.getSaleDate(),
-                revenue.getPaymentMethod(),
-                revenue.getCategory(),
-                revenue.getPaymentStatus(),
-                revenue.getEmployee(),
-                revenue.getOrderNumber()
-        );
-    }
 
     public TimeSummaryDTO listarReceitasPorPeriodo(DateRangeDTO dateRangeDTO) {
         List<Revenue> data = revenueRepository.findAllBysaleDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<RevenueDTO> revenueDTOList = data.stream()
-                .map(this::listarReceitas)
+                .map(RevenueMapper.INSTANCE::toRevenueDTO)
                 .toList();
 
         return new TimeSummaryDTO(Collections.singletonList(revenueDTOList), revenueDTOList.size());
@@ -173,7 +158,7 @@ public class FinancialService {
         List<Expense> data = expensesRepository.findAllBypaymentDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<ExpensesDTO> expensesDTOList = data.stream()
-                .map(this::listarDespesas)
+                .map(ExpenseMapper.INSTANCE::toExpenseDTO)
                 .toList();
 
         return new TimeSummaryDTO(Collections.singletonList(expensesDTOList), expensesDTOList.size());

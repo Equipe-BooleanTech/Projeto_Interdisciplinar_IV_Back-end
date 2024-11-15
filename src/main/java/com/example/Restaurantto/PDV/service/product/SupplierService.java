@@ -6,6 +6,7 @@ import com.example.Restaurantto.PDV.dto.product.GetSupplierDTO;
 import com.example.Restaurantto.PDV.dto.product.SupplierDTO;
 import com.example.Restaurantto.PDV.exception.product.SupplierAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
+import com.example.Restaurantto.PDV.mapper.product.SupplierMapper;
 import com.example.Restaurantto.PDV.model.product.Supplier;
 import com.example.Restaurantto.PDV.repository.product.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class SupplierService {
+
+    private final SupplierRepository supplierRepository;
+
     @Autowired
-    private SupplierRepository supplierRepository;
+    public SupplierService(SupplierRepository supplierRepository) {
+        this.supplierRepository = supplierRepository;
+    }
 
     public UUID salvarFornecedor(SupplierDTO supplierDTO) {
     if (supplierRepository.findByName(supplierDTO.name()).isPresent()) {
@@ -59,19 +65,10 @@ public class SupplierService {
         supplierRepository.deleteById(id);
     }
 
-    private GetSupplierDTO listarFornecedor(Supplier supplier) {
-        return new GetSupplierDTO(
-                supplier.getId(),
-                supplier.getName(),
-                supplier.getCnpj(),
-                supplier.getContact(),
-                supplier.getPhone(),
-                supplier.getCreatedAt());
-    }
 
     public Page<GetSupplierDTO> listarTodosFornecedores(PageRequest pageRequest) {
         return supplierRepository.findAll(pageRequest)
-                .map(this::listarFornecedor);
+                .map(SupplierMapper.INSTANCE::toSupplier);
 
     }
 
@@ -83,7 +80,7 @@ public class SupplierService {
         List<Supplier> suppliers = supplierRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<GetSupplierDTO> supplierDTOList = suppliers.stream()
-                .map(this::listarFornecedor)
+                .map(SupplierMapper.INSTANCE::toSupplier)
                 .toList();
 
         return new TimeSummaryDTO(Collections.singletonList(supplierDTOList), supplierDTOList.size());

@@ -6,6 +6,7 @@ import com.example.Restaurantto.PDV.dto.product.GetIngredientDTO;
 import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
 import com.example.Restaurantto.PDV.exception.product.SupplierNotFoundException;
+import com.example.Restaurantto.PDV.mapper.product.IngredientMapper;
 import com.example.Restaurantto.PDV.model.product.Ingredient;
 import com.example.Restaurantto.PDV.model.product.Supplier;
 import com.example.Restaurantto.PDV.repository.product.IngredientRepository;
@@ -21,16 +22,21 @@ import java.util.stream.Collectors;
 
 @Service
 public class IngredientService {
+
+    private final IngredientRepository ingredientRepository;
+    private final SupplierRepository supplierRepository;
+
     @Autowired
-    private IngredientRepository ingredientRepository;
-    @Autowired
-    private SupplierRepository supplierRepository;
+    public IngredientService(IngredientRepository ingredientRepository, SupplierRepository supplierRepository) {
+        this.ingredientRepository = ingredientRepository;
+        this.supplierRepository = supplierRepository;
+    }
 
     public UUID salvarIngrediente(IngredientDTO ingredientDTO) {
 
         Set<Supplier> suppliers = ingredientDTO.supplier().stream()
-                .map(supplier -> supplierRepository.findByName(supplier.getName())
-                        .orElseThrow(() -> new SupplierNotFoundException("FORNECEDOR NÃO ENCONTRADO: " + supplier.getName())))
+                .map(supplier -> supplierRepository.findByName(supplier.name())
+                        .orElseThrow(() -> new SupplierNotFoundException("FORNECEDOR NÃO ENCONTRADO: " + supplier.name())))
                 .collect(Collectors.toSet());
 
         Ingredient ingredient = Ingredient.builder()
@@ -55,8 +61,8 @@ public class IngredientService {
                 .orElseThrow(()-> new IngredientNotFoundException("INGREDIENTE NÃO ENCONTRADO"));
 
         Set<Supplier> suppliers = ingredientDTO.supplier().stream()
-                .map(supplier -> supplierRepository.findByName(supplier.getName())
-                        .orElseThrow(() -> new SupplierNotFoundException("FORNECEDOR NÃO ENCONTRADO: " + supplier.getName())))
+                .map(supplier -> supplierRepository.findByName(supplier.name())
+                        .orElseThrow(() -> new SupplierNotFoundException("FORNECEDOR NÃO ENCONTRADO: " + supplier.name())))
                 .collect(Collectors.toSet());
 
         ingredient.setName(ingredientDTO.name());
@@ -77,24 +83,10 @@ public class IngredientService {
         ingredientRepository.deleteById(id);
     }
 
-    private GetIngredientDTO listarIngrediente(Ingredient ingredient) {
-        return new GetIngredientDTO(
-                ingredient.getId(),
-                ingredient.getName(),
-                ingredient.getSuppliers(),
-                ingredient.getPrice(),
-                ingredient.getUnit(),
-                ingredient.getQuantity(),
-                ingredient.getDescription(),
-                ingredient.getIsAnimalOrigin(),
-                ingredient.getSif(),
-                ingredient.getCreatedAt()
-        );
-    }
 
     public Page<GetIngredientDTO> listarTodosIngredientes(PageRequest pageRequest) {
         return ingredientRepository.findAll(pageRequest)
-                .map(this::listarIngrediente);
+                .map(IngredientMapper.INSTANCE::toIngredient);
     }
 
     public Optional<Ingredient> listarIngredientePeloId(UUID id) {
@@ -105,7 +97,7 @@ public class IngredientService {
         List<Ingredient> ingredients = ingredientRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<GetIngredientDTO> ingredientDTOList = ingredients.stream()
-                .map(this::listarIngrediente)
+                .map(IngredientMapper.INSTANCE::toIngredient)
                 .toList();
 
         return new TimeSummaryDTO(Collections.singletonList(ingredientDTOList), ingredientDTOList.size());

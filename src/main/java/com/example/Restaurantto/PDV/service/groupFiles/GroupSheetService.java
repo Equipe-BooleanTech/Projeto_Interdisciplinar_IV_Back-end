@@ -23,11 +23,15 @@ import java.util.stream.Collectors;
 @Service
 public class GroupSheetService {
 
-    @Autowired
-    private GroupSheetRepository groupSheetRepository;
+
+    private final GroupSheetRepository groupSheetRepository;
+    private final DataSheetRepository dataSheetRepository;
 
     @Autowired
-    private DataSheetRepository dataSheetRepository;
+    public GroupSheetService(GroupSheetRepository groupSheetRepository, DataSheetRepository dataSheetRepository) {
+        this.groupSheetRepository = groupSheetRepository;
+        this.dataSheetRepository = dataSheetRepository;
+    }
 
     public UUID salvarGroupSheet(GroupSheetDTO groupSheetDTO) {
         if (groupSheetRepository.findByName(groupSheetDTO.name()).isPresent()) {

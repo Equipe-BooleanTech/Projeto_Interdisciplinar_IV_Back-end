@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.mapper.groupFinancial;
+package com.example.Restaurantto.PDV.mapper.financial;
 
 import com.example.Restaurantto.PDV.dto.financial.RevenueDTO;
 import com.example.Restaurantto.PDV.model.financial.Revenue;

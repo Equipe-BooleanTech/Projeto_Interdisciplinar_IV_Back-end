@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.mapper.groupFinancial;
+package com.example.Restaurantto.PDV.mapper.financial;
 
 import com.example.Restaurantto.PDV.dto.financial.ExpensesDTO;
 import com.example.Restaurantto.PDV.model.financial.Expense;
@@ -9,6 +9,6 @@ import org.mapstruct.factory.Mappers;
 public interface ExpenseMapper {
     ExpenseMapper INSTANCE = Mappers.getMapper(ExpenseMapper.class);
 
-    ExpensesDTO toExpensesDTO(Expense expense);
+    ExpensesDTO toExpenseDTO(Expense expense);
     Expense toExpense(ExpensesDTO expenseDTO);
 }

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 public record IngredientDTO(String name,
-                            Set<Supplier> supplier,
+                            Set<SupplierDTO> supplier,
                             Double price,
                             String unit,
                             Double quantity,

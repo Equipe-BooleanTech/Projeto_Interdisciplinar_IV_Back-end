@@ -4,10 +4,10 @@ import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
 import com.example.Restaurantto.PDV.dto.dataSheet.GetDataSheetDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
-import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.product.IngredientNotFoundException;
+import com.example.Restaurantto.PDV.mapper.dataSheet.DataSheetMapper;
 import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
 import com.example.Restaurantto.PDV.model.product.Ingredient;
 import com.example.Restaurantto.PDV.repository.dataSheet.DataSheetRepository;
@@ -24,11 +24,15 @@ import java.util.stream.Collectors;
 @Service
 public class DataSheetService {
 
-    @Autowired
-    private DataSheetRepository dataSheetRepository;
+
+    private final DataSheetRepository dataSheetRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Autowired
-    private IngredientRepository ingredientRepository;
+    public DataSheetService(DataSheetRepository dataSheetRepository, IngredientRepository ingredientRepository) {
+        this.dataSheetRepository = dataSheetRepository;
+        this.ingredientRepository = ingredientRepository;
+    }
 
     public UUID salvarDataSheet(DataSheetDTO dataSheetDTO) {
 
@@ -79,42 +83,9 @@ public class DataSheetService {
     // Listar todas as fichas técnicas
     public Page<GetDataSheetDTO> listarTodosDataSheets(PageRequest pageRequest) {
         return dataSheetRepository.findAll(pageRequest)
-                .map(this::mapearParaGetDataSheetDTO);
+                .map(DataSheetMapper.INSTANCE::toDataSheetDTO);
     }
 
-
-    private Ingredient mapearParaEntidadeIngrediente(IngredientDTO dto) {
-        return Ingredient.builder()
-                .name(dto.name())
-                .quantity(dto.quantity())
-                .unit(dto.unit())
-                .build();
-    }
-
-    private GetDataSheetDTO mapearParaGetDataSheetDTO(DataSheet dataSheet) {
-        List<IngredientDTO> ingredients = dataSheet.getIngredients().stream()
-                .map(this::mapearParaDTOIngrediente)
-                .collect(Collectors.toList());
-
-        return new GetDataSheetDTO(
-                dataSheet.getId(),
-                dataSheet.getName(),
-                ingredients,
-                dataSheet.getCreatedAt()
-        );
-    }
-
-    private IngredientDTO mapearParaDTOIngrediente(Ingredient ingredient) {
-        return new IngredientDTO(ingredient.getName(),
-                ingredient.getSuppliers(),
-                ingredient.getPrice(),
-                ingredient.getUnit(),
-                ingredient.getQuantity(),
-                ingredient.getDescription(),
-                ingredient.getIsAnimalOrigin(),
-                ingredient.getSif(),
-                ingredient.getCreatedAt());
-    }
 
     public Optional<DataSheet> listarFichaPeloId(UUID id) {
         return dataSheetRepository.findById(id);
@@ -125,7 +96,7 @@ public class DataSheetService {
             List<DataSheet> data = dataSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
             List<GetDataSheetDTO> dataSheetDTOList = data.stream()
-                    .map(this::mapearParaGetDataSheetDTO)
+                    .map(DataSheetMapper.INSTANCE::toDataSheetDTO)
                     .toList();
 
             return new TimeSummaryDTO(Collections.singletonList(dataSheetDTOList), dataSheetDTOList.size());
