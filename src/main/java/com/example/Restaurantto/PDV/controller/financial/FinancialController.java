@@ -3,7 +3,7 @@ package com.example.Restaurantto.PDV.controller.financial;
 import com.example.Restaurantto.PDV.dto.financial.*;
 import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
-import com.example.Restaurantto.PDV.model.financial.Expenses;
+import com.example.Restaurantto.PDV.model.financial.Expense;
 import com.example.Restaurantto.PDV.model.financial.Revenue;
 import com.example.Restaurantto.PDV.response.InformationResponse;
 import com.example.Restaurantto.PDV.response.SuccessResponse;
@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -118,7 +117,7 @@ public class FinancialController {
     @GetMapping("/get-expense-by-id/{id}")
     public ResponseEntity<?> buscarDespesaPorId(@PathVariable UUID id) {
         try{
-            Optional<Expenses> expense = financialService.listarDespesaPeloId(id);
+            Optional<Expense> expense = financialService.listarDespesaPeloId(id);
 
             if (expense.isPresent()) {
                 return ResponseEntity.ok(expense);

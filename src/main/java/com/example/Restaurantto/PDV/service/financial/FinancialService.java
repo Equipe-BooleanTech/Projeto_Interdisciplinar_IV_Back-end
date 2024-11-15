@@ -4,7 +4,7 @@ import com.example.Restaurantto.PDV.dto.financial.*;
 import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
 import com.example.Restaurantto.PDV.exception.financial.NoFinancialRecordsException;
 import com.example.Restaurantto.PDV.exception.financial.RecordNotFoundException;
-import com.example.Restaurantto.PDV.model.financial.Expenses;
+import com.example.Restaurantto.PDV.model.financial.Expense;
 import com.example.Restaurantto.PDV.model.financial.Revenue;
 import com.example.Restaurantto.PDV.repository.financial.ExpensesRepository;
 import com.example.Restaurantto.PDV.repository.financial.RevenueRepository;
@@ -26,7 +26,7 @@ public class FinancialService {
 
 
     public UUID criarDespesa(ExpensesDTO expensesDTO) {
-        Expenses expense = Expenses.builder()
+        Expense expense = Expense.builder()
                         .description(expensesDTO.description())
                         .category(expensesDTO.category())
                         .amount(expensesDTO.amount())
@@ -38,7 +38,7 @@ public class FinancialService {
     }
 
     public void atualizarDespesa(UUID id, ExpensesDTO expensesDTO){
-        Expenses expense = expensesRepository.findById(id)
+        Expense expense = expensesRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Despesa não encontrada"));
 
         expense.setDescription(expensesDTO.description());
@@ -46,8 +46,7 @@ public class FinancialService {
         expense.setAmount(expensesDTO.amount());
         expense.setPaymentDate(expensesDTO.paymentDate());
 
-        expensesRepository.save(expense);
-    }
+        expensesRepository.save(expense);    }
 
     public void deletarDespesa(UUID id){
         if (!expensesRepository.existsById(id)) {
@@ -95,12 +94,12 @@ public class FinancialService {
     }
 
     public BigDecimal calcularTotalDespesas(DateRangeDTO dateRange) {
-        List<Expenses> despesas = expensesRepository.findByPaymentDateBetween(dateRange.startDate(), dateRange.endDate());
+        List<Expense> despesas = expensesRepository.findByPaymentDateBetween(dateRange.startDate(), dateRange.endDate());
         if (despesas.isEmpty()) {
             throw new NoFinancialRecordsException("Nenhuma despesa encontrada no período especificado.");
         }
         return despesas.stream()
-                .map(Expenses::getAmount)
+                .map(Expense::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -131,14 +130,14 @@ public class FinancialService {
         return revenueRepository.findAll(pageRequest)
                 .map(this::listarReceitas);
     }
-    public Optional<Expenses> listarDespesaPeloId(UUID id) {
+    public Optional<Expense> listarDespesaPeloId(UUID id) {
         return expensesRepository.findById(id);
     }
     public Optional<Revenue> listarReceitaPeloId(UUID id) {
         return revenueRepository.findById(id);
     }
 
-    private ExpensesDTO listarDespesas(Expenses expense) {
+    private ExpensesDTO listarDespesas(Expense expense) {
         return new ExpensesDTO(
                 expense.getId(),
                 expense.getDescription(),
@@ -171,7 +170,7 @@ public class FinancialService {
         return new TimeSummaryDTO(Collections.singletonList(revenueDTOList), revenueDTOList.size());
     }
     public TimeSummaryDTO listarDespesasPorPeriodo(DateRangeDTO dateRangeDTO) {
-        List<Expenses> data = expensesRepository.findAllBypaymentDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+        List<Expense> data = expensesRepository.findAllBypaymentDateBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<ExpensesDTO> expensesDTOList = data.stream()
                 .map(this::listarDespesas)
