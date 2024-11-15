@@ -71,7 +71,13 @@ public class SecurityConfig {
                                 "/api/financials/delete-expense/{id}",
                                 "/api/financials/delete-revenue/{id}",
                                 "/api/financials/get-expense-by-id/{id}",
-                                "/api/financials/get-revenue-by-id/{id}"
+                                "/api/financials/get-revenue-by-id/{id}",
+                                "/api/groupfinancials/list-groupfinancial-by-period",
+                                "/api/groupfinancials/get-groupfinancial-by-id/{id}",
+                                "/api/groupfinancials/get-groupfinancial",
+                                "/api/groupfinancials/delete-groupfinancial/{id}",
+                                "/api/groupfinancials/update-groupfinancial/{id}",
+                                "/api/groupfinancials/create-groupfinancial"
                                 ).hasAnyRole(
                                 "GERENTE", "ADMIN"
                         )
