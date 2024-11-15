@@ -1,18 +1,16 @@
-package com.example.Restaurantto.PDV.service.groupSheet;
+package com.example.Restaurantto.PDV.service.groupFiles;
 
-import com.example.Restaurantto.PDV.dto.dataSheet.DataSheetDTO;
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
-import com.example.Restaurantto.PDV.dto.groupSheet.GetGroupSheetDTO;
-import com.example.Restaurantto.PDV.dto.groupSheet.GroupSheetDTO;
-import com.example.Restaurantto.PDV.dto.product.IngredientDTO;
-import com.example.Restaurantto.PDV.exception.groupSheet.GroupSheetAlreadyRegisteredException;
-import com.example.Restaurantto.PDV.exception.groupSheet.GroupSheetNotFoundException;
+import com.example.Restaurantto.PDV.dto.groupFile.GetGroupSheetDTO;
+import com.example.Restaurantto.PDV.dto.groupFile.GroupSheetDTO;
+import com.example.Restaurantto.PDV.exception.groupFile.GroupSheetAlreadyRegisteredException;
+import com.example.Restaurantto.PDV.exception.groupFile.GroupSheetNotFoundException;
+import com.example.Restaurantto.PDV.mapper.groupSheet.GroupSheetMapper;
 import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
-import com.example.Restaurantto.PDV.model.groupSheet.GroupSheet;
-import com.example.Restaurantto.PDV.model.product.Ingredient;
+import com.example.Restaurantto.PDV.model.groupFile.GroupSheet;
 import com.example.Restaurantto.PDV.repository.dataSheet.DataSheetRepository;
-import com.example.Restaurantto.PDV.repository.groupSheet.GroupSheetRepository;
+import com.example.Restaurantto.PDV.repository.groupFile.GroupSheetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -79,68 +77,21 @@ public class GroupSheetService {
 
     public Page<GetGroupSheetDTO> listarTodosGroupSheets(PageRequest pageRequest) {
         return groupSheetRepository.findAll(pageRequest)
-                .map(this::mapearParaGetGroupSheetDTO);
+                .map(GroupSheetMapper.INSTANCE::toGetGroupSheetDTO);
     }
 
-    private DataSheet mapearParaDataSheet(DataSheetDTO dataSheetDTO) {
-        // Convert ingredients from DTO to Entity
-        Set<Ingredient> ingredients = dataSheetDTO.ingredients().stream()
-                .map(ingredientDTO -> mapearParaEntidadeIngrediente(ingredientDTO))
-                .collect(Collectors.toSet());
-
-        return DataSheet.builder()
-                .name(dataSheetDTO.name())
-                .ingredients(ingredients)
-                .build();
-    }
-
-    private GetGroupSheetDTO mapearParaGetGroupSheetDTO(GroupSheet groupSheet) {
-        List<DataSheetDTO> datasheets = groupSheet.getDatasheets().stream()
-                .map(this::mapearParaDataSheetDTO)
-                .collect(Collectors.toList());
-
-        return new GetGroupSheetDTO(groupSheet.getId(), groupSheet.getName(), datasheets,groupSheet.getCreatedAt());
-    }
-
-    private DataSheetDTO mapearParaDataSheetDTO(DataSheet dataSheet) {
-        List<IngredientDTO> ingredientDTOs = dataSheet.getIngredients().stream()
-                .map(this::mapearParaDTOIngrediente)
-                .collect(Collectors.toList());
-
-        return new DataSheetDTO(dataSheet.getName(), ingredientDTOs);
-    }
-
-    private Ingredient mapearParaEntidadeIngrediente(IngredientDTO ingredientDTO) {
-        return Ingredient.builder()
-                .name(ingredientDTO.name())
-                .quantity(ingredientDTO.quantity())
-                .unit(ingredientDTO.unit())
-                .build();
-    }
-
-    private IngredientDTO mapearParaDTOIngrediente(Ingredient ingredient) {
-        return new IngredientDTO(
-                ingredient.getName(),
-                ingredient.getSuppliers(),
-                ingredient.getPrice(),
-                ingredient.getUnit(),
-                ingredient.getQuantity(),
-                ingredient.getDescription(),
-                ingredient.getIsAnimalOrigin(),
-                ingredient.getSif(),
-                ingredient.getCreatedAt()
-        );
-    }
 
     public Optional<GroupSheet> listarFichaPeloId(UUID id) {
         return groupSheetRepository.findById(id);
     }
 
     public TimeSummaryDTO listarGrupoDeFichasPorPeriodo(DateRangeDTO dateRangeDTO) {
-        List<GroupSheet> data = groupSheetRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
+        List<GroupSheet> data = groupSheetRepository.findAllByCreatedAtBetween(
+                dateRangeDTO.startDate(), dateRangeDTO.endDate()
+        );
 
         List<GetGroupSheetDTO> dataSheetDTOList = data.stream()
-                .map(this::mapearParaGetGroupSheetDTO)
+                .map(GroupSheetMapper.INSTANCE::toGetGroupSheetDTO)
                 .toList();
 
         return new TimeSummaryDTO(Collections.singletonList(dataSheetDTOList), dataSheetDTOList.size());

@@ -1,7 +1,6 @@
-package com.example.Restaurantto.PDV.repository.groupSheet;
+package com.example.Restaurantto.PDV.repository.groupFile;
 
-import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
-import com.example.Restaurantto.PDV.model.groupSheet.GroupSheet;
+import com.example.Restaurantto.PDV.model.groupFile.GroupSheet;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
