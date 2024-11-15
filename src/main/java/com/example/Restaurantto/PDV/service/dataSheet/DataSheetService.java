@@ -31,24 +31,32 @@ public class DataSheetService {
     private IngredientRepository ingredientRepository;
 
     public UUID salvarDataSheet(DataSheetDTO dataSheetDTO) {
-
         if (dataSheetRepository.findByName(dataSheetDTO.name()).isPresent()) {
             throw new DataSheetAlreadyRegisteredException("Ficha técnica já cadastrada");
         }
+
         Set<Ingredient> ingredients = dataSheetDTO.ingredients().stream()
                 .map(ingredient -> ingredientRepository.findByName(ingredient.name())
                         .orElseThrow(() -> new IngredientNotFoundException("INGREDIENTE NÃO ENCONTRADO: " + ingredient.name())))
                 .collect(Collectors.toSet());
 
+        // Cálculo do custo total com base nos ingredientes
+        double cost = ingredients.stream()
+                .mapToDouble(Ingredient::getPrice)
+                .sum();
 
-        // Criar a ficha técnica com os ingredientes associados
+        // Cálculo do preço de venda (30% acima do custo)
+        double salePrice = cost * 1.3;
+
         DataSheet dataSheet = DataSheet.builder()
                 .name(dataSheetDTO.name())
+                .unit(dataSheetDTO.unit())
                 .ingredients(ingredients)
+                .cost(cost)
+                .salePrice(salePrice)
                 .build();
 
         dataSheetRepository.save(dataSheet);
-
         return dataSheet.getId();
     }
 
@@ -62,18 +70,23 @@ public class DataSheetService {
                         .orElseThrow(() -> new IngredientNotFoundException("INGREDIENTE NÃO ENCONTRADO: " + ingredient.name())))
                 .collect(Collectors.toSet());
 
+        // Atualizar os campos
         dataSheet.setName(dataSheetDTO.name());
+        dataSheet.setUnit(dataSheetDTO.unit());
         dataSheet.setIngredients(ingredients);
+
+        // Recalcular os valores
+        double cost = ingredients.stream()
+                .mapToDouble(Ingredient::getPrice)
+                .sum();
+        double salePrice = cost * 1.3;
+
+        dataSheet.setCost(cost);
+        dataSheet.setSalePrice(salePrice);
 
         dataSheetRepository.save(dataSheet);
     }
 
-    public void deletarDataSheet(UUID id) {
-        if (!dataSheetRepository.existsById(id)) {
-            throw new DataSheetNotFoundException("Ficha técnica não encontrada");
-        }
-        dataSheetRepository.deleteById(id);
-    }
 
     // Listar todas as fichas técnicas
     public Page<GetDataSheetDTO> listarTodosDataSheets(PageRequest pageRequest) {
@@ -98,9 +111,13 @@ public class DataSheetService {
         return new GetDataSheetDTO(
                 dataSheet.getId(),
                 dataSheet.getName(),
+                dataSheet.getUnit(),
+                dataSheet.getCost(),
+                dataSheet.getSalePrice(),
                 ingredients
         );
     }
+
 
     private IngredientDTO mapearParaDTOIngrediente(Ingredient ingredient) {
         return new IngredientDTO(ingredient.getName(),
@@ -116,5 +133,7 @@ public class DataSheetService {
     public Optional<DataSheet> listarFichaPeloId(UUID id) {
         return dataSheetRepository.findById(id);
     }
-    }
+}
+
+
 

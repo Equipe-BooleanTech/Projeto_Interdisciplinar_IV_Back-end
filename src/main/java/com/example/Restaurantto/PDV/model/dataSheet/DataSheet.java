@@ -1,5 +1,6 @@
 package com.example.Restaurantto.PDV.model.dataSheet;
 
+import com.example.Restaurantto.PDV.enums.UnitType;
 import com.example.Restaurantto.PDV.model.product.Ingredient;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,6 +23,13 @@ public class DataSheet {
     private UUID id;
 
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    private UnitType unit; // Unidade do produto (g, ml, unidade)
+
+    private Double cost; // Custo total da ficha técnica
+
+    private Double salePrice; // Preço de venda (30% acima do custo)
 
     @ManyToMany
     @JoinTable(

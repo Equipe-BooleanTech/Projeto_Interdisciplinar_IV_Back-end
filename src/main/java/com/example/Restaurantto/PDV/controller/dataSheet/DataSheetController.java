@@ -49,22 +49,25 @@ public class DataSheetController {
 
     // Listar todos os DataSheets com paginação
     @GetMapping("/get-datasheets")
-    public ResponseEntity<Page<GetDataSheetDTO>> listarTodosDataSheets(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<GetDataSheetDTO>> listarTodosDataSheets(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
         Page<GetDataSheetDTO> dataSheets = dataSheetService.listarTodosDataSheets(PageRequest.of(page, size));
         return ResponseEntity.ok(dataSheets);
     }
+
 
     @GetMapping("/get-datasheet-by-id/{id}")
     public ResponseEntity<?> buscarFichaPorId(@PathVariable UUID id) {
         try {
             Optional<DataSheet> dataSheet = dataSheetService.listarFichaPeloId(id);
-            if (dataSheet.isPresent()){
+            if (dataSheet.isPresent()) {
                 return ResponseEntity.ok(dataSheet);
-            }else {
+            } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("FICHA NÃO ENCONTRADA \n ID INVÁLIDO");
             }
 
-        }catch (DataSheetNotFoundException e){
+        } catch (DataSheetNotFoundException e) {
             throw e;
         }
     }
