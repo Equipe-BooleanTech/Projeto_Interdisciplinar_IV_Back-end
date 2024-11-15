@@ -1,12 +1,12 @@
-package com.example.Restaurantto.PDV.controller.groupSheet;
+package com.example.Restaurantto.PDV.controller.groupFiles;
 
 import com.example.Restaurantto.PDV.dto.financial.DateRangeDTO;
 import com.example.Restaurantto.PDV.dto.global.TimeSummaryDTO;
-import com.example.Restaurantto.PDV.dto.groupSheet.GroupSheetDTO;
-import com.example.Restaurantto.PDV.dto.groupSheet.GetGroupSheetDTO;
+import com.example.Restaurantto.PDV.dto.groupFile.GroupSheetDTO;
+import com.example.Restaurantto.PDV.dto.groupFile.GetGroupSheetDTO;
 import com.example.Restaurantto.PDV.exception.dataSheet.DataSheetNotFoundException;
-import com.example.Restaurantto.PDV.model.groupSheet.GroupSheet;
-import com.example.Restaurantto.PDV.service.groupSheet.GroupSheetService;
+import com.example.Restaurantto.PDV.model.groupFile.GroupSheet;
+import com.example.Restaurantto.PDV.service.groupFiles.GroupSheetService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -72,9 +71,6 @@ public class GroupSheetController {
     public ResponseEntity<?> listarGrupoDeFichasPorPeriodo(
             @RequestBody DateRangeDTO dateRangeDTO,
             @RequestParam(defaultValue = "monthly") String groupingType) {
-        // ATENÇÃO SE PASSAR A URL NORMAL ELE VAI LISTAR POR MÊS
-        // PASSANDO A URL ASSIM list-groupsheets-by-period?groupingType=weekly ELE LISTA POR SEMANA
-        // PASSANDO A URL ASSIM list-groupsheets-by-period?groupingType=yearly ELE LISTA POR ANO
         TimeSummaryDTO grupoDeFichasPorPeriodo = groupSheetService.listarGrupoDeFichasPorPeriodo(dateRangeDTO);
 
         if (grupoDeFichasPorPeriodo.data().isEmpty()) {

@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.model.groupSheet;
+package com.example.Restaurantto.PDV.model.groupFile;
 
 import com.example.Restaurantto.PDV.model.dataSheet.DataSheet;
 import jakarta.persistence.*;

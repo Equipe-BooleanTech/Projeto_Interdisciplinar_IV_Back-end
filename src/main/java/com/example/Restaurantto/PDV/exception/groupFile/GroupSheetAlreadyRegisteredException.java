@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.exception.groupSheet;
+package com.example.Restaurantto.PDV.exception.groupFile;
 
 public class GroupSheetAlreadyRegisteredException extends RuntimeException {
     public GroupSheetAlreadyRegisteredException(String message) {
