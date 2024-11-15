@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record GetIngredientDTO(UUID id,
                                String name,
-                               Set<Supplier> supplier,
+                               Set<SupplierDTO> suppliers,
                                Double price,
                                String unit,
                                Double quantity,

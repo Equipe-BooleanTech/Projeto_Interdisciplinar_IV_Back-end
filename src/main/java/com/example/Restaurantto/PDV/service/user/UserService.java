@@ -9,6 +9,7 @@ import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.exception.user.EmailAlreadyRegisteredException;
 import com.example.Restaurantto.PDV.exception.user.InvalidCredentialsException;
 import com.example.Restaurantto.PDV.exception.user.UserNotFoundException;
+import com.example.Restaurantto.PDV.mapper.user.UserMapper;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.model.user.ModelUser;
 import com.example.Restaurantto.PDV.model.user.ModelUserDetailsImpl;
@@ -266,34 +267,10 @@ public class UserService {
         }
     }
 
-    private UserDTO mapToUserDTO(ModelUser user) {
-        return new UserDTO(
-                user.getId(),
-                user.getEmail(),
-                user.getRole().getName(),
-                user.getFullName(),
-                user.getPhone(),
-                user.getCpf(),
-                user.getCep(),
-                user.getAddress(),
-                user.getAddressNumber(),
-                user.getCity(),
-                user.getState(),
-                user.getNeighborhood(),
-                user.getCnpj(),
-                user.getMessage(),
-                user.getEnterprise(),
-                user.isProspecting(),
-                user.isEmployee(),
-                user.getFunction(),
-                user.getPassword(),
-                user.getCreatedAt()
-        );
-    }
 
     public Page<UserDTO> listarTodosUsuarios(PageRequest pageRequest) {
         return userRepository.findAll(pageRequest)
-                .map(this::mapToUserDTO);
+                .map(UserMapper.INSTANCE::ToModelUser);
     }
 
     public Optional<ModelUser> listarPeloId(UUID id) {
@@ -304,7 +281,7 @@ public class UserService {
         List<ModelUser> users = userRepository.findAllByCreatedAtBetween(dateRangeDTO.startDate(), dateRangeDTO.endDate());
 
         List<UserDTO> userList = users.stream()
-                .map(this::mapToUserDTO)
+                .map(UserMapper.INSTANCE::ToModelUser)
                 .toList();
 
         return new TimeSummaryDTO(Collections.singletonList(userList), userList.size());
