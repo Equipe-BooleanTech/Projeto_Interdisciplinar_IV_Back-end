@@ -26,11 +26,12 @@ public class FinancialService {
 
 
     public UUID criarDespesa(ExpensesDTO expensesDTO) {
-        Expenses expense = new Expenses();
-        expense.setDescription(expensesDTO.description());
-        expense.setCategory(expensesDTO.category());
-        expense.setAmount(expensesDTO.amount());
-        expense.setPaymentDate(expensesDTO.paymentDate());
+        Expenses expense = Expenses.builder()
+                        .description(expensesDTO.description())
+                        .category(expensesDTO.category())
+                        .amount(expensesDTO.amount())
+                        .paymentDate(expensesDTO.paymentDate())
+                        .build();
 
         expensesRepository.save(expense);
         return expense.getId();
@@ -55,12 +56,17 @@ public class FinancialService {
         expensesRepository.deleteById(id);
     }
 
-    // CRUD para Revenue
 
     public UUID criarReceita(RevenueDTO revenueDTO) {
-        Revenue revenue = new Revenue();
-        revenue.setAmount(revenueDTO.amount());
-        revenue.setSaleDate(revenueDTO.saleDate());
+        Revenue revenue = Revenue.builder()
+                        .amount(revenueDTO.amount())
+                        .saleDate(revenueDTO.saleDate())
+                        .paymentMethod(revenueDTO.paymentMethod())
+                        .category(revenueDTO.category())
+                        .paymentStatus(revenueDTO.paymentStatus())
+                        .employee(revenueDTO.employee())
+                        .orderNumber(revenueDTO.orderNumber())
+                        .build();
 
         revenueRepository.save(revenue);
         return revenue.getId();
@@ -72,6 +78,11 @@ public class FinancialService {
 
         revenue.setAmount(revenueDTO.amount());
         revenue.setSaleDate(revenueDTO.saleDate());
+        revenue.setPaymentMethod(revenueDTO.paymentMethod());
+        revenue.setCategory(revenueDTO.category());
+        revenue.setPaymentStatus(revenueDTO.paymentStatus());
+        revenue.setEmployee(revenueDTO.employee());
+        revenue.setOrderNumber(revenueDTO.orderNumber());
 
         revenueRepository.save(revenue);
     }
@@ -141,7 +152,12 @@ public class FinancialService {
         return new RevenueDTO(
                 revenue.getId(),
                 revenue.getAmount(),
-                revenue.getSaleDate()
+                revenue.getSaleDate(),
+                revenue.getPaymentMethod(),
+                revenue.getCategory(),
+                revenue.getPaymentStatus(),
+                revenue.getEmployee(),
+                revenue.getOrderNumber()
         );
     }
 
