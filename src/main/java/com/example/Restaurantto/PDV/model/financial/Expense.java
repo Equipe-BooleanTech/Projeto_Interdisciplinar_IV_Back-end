@@ -17,7 +17,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "despesas")
-public class Expenses {
+public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
