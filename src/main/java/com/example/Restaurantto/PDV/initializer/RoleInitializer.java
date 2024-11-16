@@ -4,11 +4,13 @@ import com.example.Restaurantto.PDV.enums.Role;
 import com.example.Restaurantto.PDV.model.user.ModelRole;
 import com.example.Restaurantto.PDV.repository.user.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
 @Component
+@Order(1)
 public class RoleInitializer implements CommandLineRunner {
 
     private final RoleRepository roleRepository;
