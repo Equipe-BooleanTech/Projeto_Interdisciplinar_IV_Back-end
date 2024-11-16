@@ -39,7 +39,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/users/update/**",
                                 "/api/users/delete/**",
-                                "/api/users/update-password").authenticated()
+                                "/api/users/update-password",
+                                "/api/orders/create-order",
+                                "/api/orders/update-order/{id}",
+                                "/api/orders/delete-order/{id}",
+                                "/api/orders/list-orders",
+                                "/api/orders/get-order-by-id/{id}").authenticated()
                         .requestMatchers(
                                 "/api/users/get-users",
                                 "/api/users/get-users-by-id/{id}",
