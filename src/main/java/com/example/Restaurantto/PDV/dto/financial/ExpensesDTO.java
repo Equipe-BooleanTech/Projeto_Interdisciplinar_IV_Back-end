@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record ExpensesDTO(UUID id,
+                          String name,
                           String description,
                           ExpenseCategory category,
                           BigDecimal amount,

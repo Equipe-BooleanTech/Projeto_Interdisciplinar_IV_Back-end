@@ -34,6 +34,7 @@ public class FinancialService {
 
     public UUID criarDespesa(ExpensesDTO expensesDTO) {
         Expense expense = Expense.builder()
+                        .name(expensesDTO.name())
                         .description(expensesDTO.description())
                         .category(expensesDTO.category())
                         .amount(expensesDTO.amount())
@@ -47,7 +48,7 @@ public class FinancialService {
     public void atualizarDespesa(UUID id, ExpensesDTO expensesDTO){
         Expense expense = expensesRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Despesa não encontrada"));
-
+        expense.setName(expensesDTO.name());
         expense.setDescription(expensesDTO.description());
         expense.setCategory(expensesDTO.category());
         expense.setAmount(expensesDTO.amount());
@@ -65,6 +66,7 @@ public class FinancialService {
 
     public UUID criarReceita(RevenueDTO revenueDTO) {
         Revenue revenue = Revenue.builder()
+                        .name(revenueDTO.name())
                         .amount(revenueDTO.amount())
                         .saleDate(revenueDTO.saleDate())
                         .paymentMethod(revenueDTO.paymentMethod())
@@ -81,7 +83,7 @@ public class FinancialService {
     public void atualizarReceita(UUID id, RevenueDTO revenueDTO){
         Revenue revenue = revenueRepository.findById(id)
                 .orElseThrow(() -> new RecordNotFoundException("Receita não encontrada"));
-
+        revenue.setName(revenueDTO.name());
         revenue.setAmount(revenueDTO.amount());
         revenue.setSaleDate(revenueDTO.saleDate());
         revenue.setPaymentMethod(revenueDTO.paymentMethod());

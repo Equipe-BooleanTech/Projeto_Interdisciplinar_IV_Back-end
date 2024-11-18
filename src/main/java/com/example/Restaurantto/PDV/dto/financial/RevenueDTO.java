@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record RevenueDTO(UUID id,
+                         String name,
                          BigDecimal amount,
                          LocalDate saleDate,
                          PaymentMethod paymentMethod,
