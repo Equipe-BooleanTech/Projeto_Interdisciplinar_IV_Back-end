@@ -21,6 +21,8 @@ public class Revenue {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    private String name;
+
     private BigDecimal amount;
 
     private LocalDate saleDate;
